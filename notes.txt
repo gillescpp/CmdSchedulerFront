@@ -1,0 +1,420 @@
+#perequis :
+- npm (nodejs)
+- npm install -g degit
+- rollup pour la transpil : npm install --global rollup
+
+# 1 - init projet :
+npx degit sveltejs/template XXXXMYPROJECTXXXX
+cd XXXXMYPROJECTXXXX
+npm install
+
+In the package.json file, there is a section called "scripts". 
+These scripts define shortcuts for working with your application — dev, build and start. 
+To launch your app in development mode, type the following:
+
+npm run dev
+
+-> http://localhost:5000
+(gere le hot reload)
+
+
+# supplement
+* ajout de page.js : npm install page.js
+** note : dans package.json, changer "start": "sirv public" pour "start": "sirv public --single" si nécessaires
+
+
+# 2 - faire un build de prod :
+
+npm run build
+
+Your public directory now contains a compressed bundle.js file containing your app's JavaScript. You can run it like so:
+npm run start
+
+see README.md for deploy
+
+
+
+
+# Lifecycle
+
+It's recommended to put the fetch in onMount rather than at the top level of the <script> because of server-side rendering (SSR). With the exception of onDestroy, lifecycle functions don't run during SSR, which means we can avoid fetching data that should be loaded lazily once the component has been mounted in the DOM.
+If the onMount callback returns a function, that function will be called when the component is destroyed.
+The beforeUpdate function schedules work to happen immediately before the DOM has been updated. afterUpdate is its counterpart, used for running code once the DOM is in sync with your data.
+Note that beforeUpdate will first run before the component has mounted, so we need to check for the existence of div before reading its properties.
+
+----------------------------------------------------
+<script>
+	import { onMount } from 'svelte';
+
+	let photos = [];
+
+	onMount(async () => {
+		const res = await fetch(`https://jsonplaceholder.typicode.com/photos?_limit=20`);
+		photos = await res.json();
+	});
+</script>
+
+<style>
+	.photos {
+		width: 100%;
+		display: grid;
+		grid-template-columns: repeat(5, 1fr);
+		grid-gap: 8px;
+	}
+
+	figure, img {
+		width: 100%;
+		margin: 0;
+	}
+</style>
+
+<h1>Photo album</h1>
+
+<div class="photos">
+	{#each photos as photo}
+		<figure>
+			<img src={photo.thumbnailUrl} alt={photo.title}>
+			<figcaption>{photo.title}</figcaption>
+		</figure>
+	{:else}
+		<!-- this block renders when photos.length === 0 -->
+		<p>loading...</p>
+	{/each}
+</div>
+-------------------------------------------------------------
+<script>
+	import { onDestroy } from 'svelte';
+
+	let seconds = 0;
+	const interval = setInterval(() => seconds += 1, 1000);
+
+	onDestroy(() => clearInterval(interval));
+</script>
+-------------------------------------------------------------
+Event tick
+When you update component state in Svelte, it doesn't update the DOM immediately. Instead, it waits until the next microtask to see if there are any other changes that need to be applied, including in other components. Doing so avoids unnecessary work and allows the browser to batch things more effectively.
+import { tick } from 'svelte';
+await tick();
+..recup valeur dom qu'on vient de modifier : le fait d'avoir attendu le tick fait qu'on sait qu'elle dans un état "stable"..
+
+
+
+
+
+# Stores
+
+Sometimes, you'll have values that need to be accessed by multiple unrelated components, or by a regular JavaScript module.
+In Svelte, we do this with stores. A store is simply an object with a subscribe method that allows interested parties to be notified whenever the store value changes
+
+ex : stores.js
+import { writable } from 'svelte/store';
+
+export const count = writable(0); //un store met a dispo la methode subscribe, un writable rajoute update et set
+
+puis dans les compos : Decrementer.svelte
+<script>
+	import { count } from './stores.js';
+
+	function decrement() {
+		count.update(n => n - 1);
+		// autre option : count.set(xx);
+	}
+</script>
+
+<button on:click={decrement}>
+	-
+</button>
+
+---------------App.svelte
+<script>
+	import { count } from './stores.js';
+	import Incrementer from './Incrementer.svelte';
+	import Decrementer from './Decrementer.svelte';
+	import Resetter from './Resetter.svelte';
+	import { onDestroy } from 'svelte';
+
+	let count_value;
+
+	const unsubscribe = count.subscribe(value => {
+		count_value = value; //appelé a chaque update du store
+	});
+
+	onDestroy(unsubscribe); //in faut aussi se desincrire sur destroy sinon mem leak si compo crée/detruit plusieurs fois
+</script>
+
+<h1>The count is {count_value}</h1>
+
+<Incrementer/>
+<Decrementer/>
+<Resetter/>
+
+
+On peu aussi utiliser du system d'auto subcribre avec le sighne $
+---------------App.svelte
+<script>
+	import { count } from './stores.js';
+	import Incrementer from './Incrementer.svelte';
+	import Decrementer from './Decrementer.svelte';
+	import Resetter from './Resetter.svelte';
+
+//Auto-subscription only works with store variables that are declared (or imported) at the top-level scope of a component.
+//Any name beginning with $ is assumed to refer to a store value. It's effectively a reserved character — Svelte will prevent you from declaring your own variables with a $ prefix.
+</script>
+
+<h1>The count is {$count}</h1>
+
+<Incrementer/>
+<Decrementer/>
+<Resetter/>
+
+
+Note : un store writable (methode set) est bindable <input bind:value={$name}>
+
+-----------------------------------------------------------
+-----------------------------------------------------------
+
+store en realonly : 
+store.js : -------------
+import { readable } from 'svelte/store';
+
+export const time = readable(new Date(), function start(set) {
+	const interval = setInterval(() => {
+		set(new Date());
+	}, 1000);
+
+	return function stop() {
+		clearInterval(interval);
+	};
+});
+
+const start = new Date();
+
+export const elapsed = derived( //autre type de store : un store qui s'appui sur un autre
+	time,
+	$time => Math.round(($time - start) / 1000)
+);
+
+et App.svelte : -----------------------
+<script>
+	import { time } from './stores.js';
+
+	const formatter = new Intl.DateTimeFormat('en', {
+		hour12: true,
+		hour: 'numeric',
+		minute: '2-digit',
+		second: '2-digit'
+	});
+</script>
+
+<h1>The time is {formatter.format($time)}</h1>
+
+
+
+
+
+-----------------------------------------------------------
+-----------------------------------------------------------
+
+cas d'un custom store : un store doit simplement implémenter la methode subscribe
+on peu ensuite en ajouter d'autre pour en faire un store metier :
+
+store.js : -------------
+import { writable } from 'svelte/store';
+
+function createCount() {
+	const { subscribe, set, update } = writable(0);
+
+	return {
+		subscribe,
+		increment: () => update(n => n + 1),
+		decrement: () => update(n => n - 1),
+		reset: () => set(0)
+	};
+}
+
+export const count = createCount();
+
+
+et App.svelte : -----------------------
+<script>
+	import { count } from './stores.js';
+</script>
+
+<h1>The count is {$count}</h1>
+
+<button on:click={count.increment}>+</button>
+<button on:click={count.decrement}>-</button>
+<button on:click={count.reset}>reset</button>
+
+
+
+-----------------------------------------------------------
+-----------------------------------------------------------
+
+
+# motion
+
+import { tweened } from 'svelte/motion';
+const progress = tweened(0); //store qui permet de changer un valeur progressivement (pur uin effet de transition)
+// svelte/easing contient de fonction de transition non lineaire
+	const progress = tweened(0, {
+		duration: 400,
+		easing: cubicOut
+	});
+
+<button on:click="{() => progress.set(0.25)}">
+	25%
+</button>
+
+pour un effet "ressort amorti", voir effet spring
+
+
+# Transition
+
+fading : ----------
+<script>
+	import { fade } from 'svelte/transition';
+	let visible = true;
+</script>
+
+<label>
+	<input type="checkbox" bind:checked={visible}>
+	visible
+</label>
+
+{#if visible}
+	<p transition:fade> <-- avec import { fly } from 'svelte/transition'; : transition:fly="{{ y: 200, duration: 2000 }} -->
+		Fades in and out
+	</p>
+{/if}
+
+
+# classe css
+
+<script>
+	let current = 'foo';
+</script>
+
+<style>
+	button {
+		display: block;
+	}
+
+	.selected {
+		background-color: #ff3e00;
+		color: white;
+	}
+</style>
+
+<button
+	class:selected="{current === 'foo'}"
+	on:click="{() => current = 'foo'}"
+>foo</button>
+
+<button
+	class:selected="{current === 'bar'}"
+	on:click="{() => current = 'bar'}"
+>bar</button>
+
+<button
+	class:selected="{current === 'baz'}"
+	on:click="{() => current = 'baz'}"
+>baz</button>
+
+
+note shorthand :
+<div class:big>
+egale à <div class:big={big}> 
+
+
+# Injection html dans un compo enfant
+
+-> on met un <slot></slot> dans l'enfant :
+Box.svelte---------
+<div class="box">
+	<h2>Hello!</h2>
+	<slot></slot> <-- note : on peut mettre un contenu "par defaut" dans le slot pour le cas ou le parent n'injecte rien -->
+</div>
+
+et depuis le compo parent, on met le html souhaité dans la balise du compo :
+<Box>
+	<div>
+		<p>I'm a child of the div</p>
+	</div>
+</Box>
+
+------------
+Les slots peuvent être multiple, il faut alors les nommer :
+		<slot name="email">
+			<span class="missing">Unknown email</span>
+		</slot>
+Et depuis le parent, les injecter de maniere nommé en span ou div :
+<ContactCard>
+	<span slot="name">
+		P. Sherman
+	</span>
+
+	<span slot="email">bla@email.com</span>
+</ContactCard>
+
+
+# module : 
+
+Sur un composant qui va potentiellement être instancié plusieurs, on peut avoir
+du code qui ne va être évalué qu'un seul fois. ca permet de lance un code une seul fois
+ou de déclarer des variables communes aux instance du même compo
+
+<script context="module">
+	let current;
+
+	export function stopAll() {
+		elements.forEach(element => {
+			element.pause();
+		});
+	}
+</script>
+
+<script>
+	export let src;
+	export let title;
+	export let composer;
+
+	let audio;
+	let paused = true;
+
+	function stopOthers() {
+		if (current && current !== audio) current.pause();
+		current = audio;
+	}
+</script>
+
+# debug
+
+tracer une valeur
+option 1 console : {(console.log(user), '')}
+option 2 tag debug : {@debug user}
+
+# commentaires
+
+<script>
+  /** What should we call the user? */
+  export let name = 'world';
+</script>
+
+<!--
+@component
+Here's some documentation for this component.
+It will show up on hover.
+
+- You can use markdown here.
+- You can also use code blocks here.
+- Usage:
+  ```tsx
+  <main name="Arethra">
+  ```
+-->
+<main>
+  <h1>
+    Hello, {name}
+  </h1>
+</main>
