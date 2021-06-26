@@ -2,35 +2,35 @@
 	//lib routage
 	import page from 'page.js'
 	import { mainPages } from './common/page-menu.js'
-	//compo navigation
+	import { IsAuth } from './common/global'
 	import Nav from './Nav.svelte'
-	//import { activeTab } from './common/global.js'
-	//compos pages
-	import Home from './components/Home.svelte'
 	import NotFound from './components/NotFound.svelte'
-	//import Users from './components/users/Users.svelte'  
+
+	//props
+	//export let appTitle = '';
 
 	//routage
-	let currentPage = '';
+	let currentPage = 0;
 	let currentCompo = {};
 	let currentRouteParams = {};
-	page('/', (ctx) => {
-		currentPage = 'Home';
-		currentCompo = Home;
-		currentRouteParams = ctx.params;
-	});	
-	page('/advanced', (ctx) => {
-		currentPage = 'Advanced';
-		currentCompo = Advanced;
-		currentRouteParams = ctx.params;
-	});	
-	page('/user/:id', (ctx) => {
-		currentPage = 'User';
-		currentCompo = User;
-		currentRouteParams = ctx.params;
-	});	
+
+	for (const item of mainPages) {
+		for (const rt of item.routes) {
+			if ( rt.component ) {
+				page(item.path+rt.path, (ctx) => {
+					if ( !item.public && !IsAuth() ) {
+						page.redirect("/auth")
+					} else {
+						currentPage = item.id;
+						currentCompo = rt.component;
+						currentRouteParams = ctx.params;
+					}
+				});	
+			}
+		}
+	}
 	page('*', (ctx) => {
-		currentPage = '';
+		currentPage = 0;
 		currentCompo = NotFound;
 	});	
 	page.start()
@@ -55,22 +55,14 @@
 
 </script>
 
-<Nav activeTab={currentPage} />
+<Nav activePage={currentPage} />
 
 <main>
-	{#if currentPage === ''}
+	{#if currentPage === 0}
 	Not Found.
 	{:else }
-	Compo {currentPage}
-	<svelte:component this={currentCompo}/>
-		
-	<!-- <svelte:component this={currentCompo} routeParams={currentRouteParams} /> -->
+	<svelte:component this={currentCompo} routeParams={currentRouteParams}/>
 	{/if}
-	<!-- <svelte:component this={currentPage} /> -->
-	<!--
-	<svelte:component this={pages.get(currentPage).component} routeParams={currentRouteParams} /> 
-	-->
-	
 	<!--
 	{#if currentPage === 'About'}
 	<About/>

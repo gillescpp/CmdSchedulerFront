@@ -1,25 +1,36 @@
 <script>
-import { onMount } from "svelte";
-import { mainPages } from "./common/page-menu"
+	import { mainPages } from "./common/page-menu"
 
+	//elements du menu
+	export let activePage = 0; //fourni par App
 
-	export let activeTab = '';
-	$: isActive = (str) => str == activeTab ? 'selected' : '';
+	$: isActive = (pgid) => pgid == activePage ? 'selected' : '';
 
-	onMount(()=>{
-		//
-	})
+	//prepa seuls elements visible du menu : visibleMnu + 1 compo de réf
+	let mnuView = [];
+	for (const mnu of mainPages) {
+		if ( mnu.visibleMnu ) {
+			for (const el of mnu.routes) {
+				if ( el.component != null ) {
+					mnuView.push(mnu);
+					break;
+				}
+			}
+		}
+	}
 
 </script>
 
 <p>
-	{activeTab}
+	{activePage}
 </p>
 <nav>
 	<ul>
-		{#each mainPages as page }
-			<li><a class="{ isActive(page.name) }" href="{page.menuUrl}">{page.name}</a></li>
-		{/each}
+		{#each mnuView as item}
+		{#if item.visibleMnu}
+		<li><a class="{ isActive(item.id) }" href="{item.path}">{item.name}</a></li>
+		{/if}
+		{/each}	
 	</ul>
 </nav>
 

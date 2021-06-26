@@ -1,5 +1,5 @@
 <script>
-	export const routeParams = {}
+	export let routeParams = {}
 	let count = 0;
 
 	function handleClick() {
