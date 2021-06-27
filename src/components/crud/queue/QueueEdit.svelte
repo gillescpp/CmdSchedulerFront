@@ -4,46 +4,78 @@
     import { ApiFetch, ApiPost } from './../../../common/global.js'  
     import page from 'page.js' 
 
-	export let routeParams = {}
+	export let routeParams = {};
+    let errMsg = '';
+    let errMsgClass = '';
     let id = 0; //0=nouveau
     let readonly = false;
     let data = NewQueue();
 
     if ( routeParams.id > 0 ) {
-        id = routeParams.id
+        id = routeParams.id;
     }
 
     //fetch info
     onMount(async function() {
+        updateData();
+    });
+
+    // ou sur changemnt
+    $: if (id) {
+        updateData();
+    }
+
+    // get fiche
+    async function updateData() {
+        console.log("..");
         if (id > 0) {
+            errMsg = '...';
+            errMsgClass = '';
+
             //recup fiche
             ApiFetch('queues/'+id, "GET")
             .then((js) => {
-                data = js
+                data = js;
             }) 
             .catch(err => {
-                alert(err)
+                errMsgClass = 'error';
+                errMsg = err;
+                readonly = true;
             });
         }
-    });
+    }
 
     //hanfle submit
     function handleSubmit(event) {
-        let url = 'queues'
+        errMsg = '...';
+        errMsgClass = '';
 
-        ApiPost("queues", data.id, data)
-            .then(() => {
-                 page.redirect('/queue');
+        ApiPost('queues', data.id, data)
+            .then((resp) => {
+                console.log(resp);
+                if ( resp && resp.id > 0 ) {
+                    id = resp.id;
+                }
+                if ( id > 0 ){
+                    //updateData();
+                    page.redirect('/queue/'+id)
+
+                    errMsg = 'ok';
+                    errMsgClass = 'info';
+                } else {
+                    page.redirect('/queue');
+                }
             }) 
             .catch(err => {
-                alert(err)
+                errMsgClass = 'error';
+                errMsg = err;
             });
     }
 
 </script>
 
 <main>
-    <div class="page">
+    <div class="content">
         {#if id<=0}
         <h3>Nouvelle Queue</h3>
         {:else}
@@ -71,11 +103,13 @@
                 </div>
                 {#if !readonly}
                 <div class="pure-controls">
-                    <button type="submit" class="pure-button pure-button-primary">Save</button>
+                    <button type="submit" class="pure-button pure-button-primary" id="authbtn">Save</button>
                 </div>
                 {/if}       
             </fieldset>
         </form>
+
+        <span class="pure-form-message {errMsgClass}">{errMsg}.</span>
     </div>
 </main>
 

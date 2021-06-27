@@ -2,14 +2,14 @@
     import { Auth, IsAuth } from '../common/global'
     import page from 'page.js'
 	//export let routeParams = {}
-    let user = ''
-    let password = ''
-    let errMsg = ''
-    let errMsgClass = ''
+    let user = '';
+    let password = '';
+    let errMsg = '';
+    let errMsgClass = '';
 
     async function handleSubmit() {
-        errMsg = '...'
-        errMsgClass = ''
+        errMsg = '...';
+        errMsgClass = '';
 
         var authbt = document.getElementById("authbt");
         authbt.disabled = true;
@@ -19,8 +19,8 @@
                 page.redirect('/');
             }) 
             .catch(err => {
-                errMsgClass = 'error'
-                errMsg = err
+                errMsgClass = 'error';
+                errMsg = err;
             });
         authbt.disabled = false;
 	}

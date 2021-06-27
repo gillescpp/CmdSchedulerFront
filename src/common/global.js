@@ -1,4 +1,5 @@
 import { writable } from 'svelte/store'
+import page from 'page.js'
 
 export const apiURL = "http://localhost:8100/cmdscheduler"
 export const activeTab = writable("");
@@ -13,14 +14,7 @@ export async function Auth(usr, pass) {
     let headers = new Headers();
     headers.append('Content-Type', 'application/json; charset=UTF-8');
     headers.append('Authorization', 'Basic ' + btoa(usr + ":" + pass));
-
-    let i = 0;
-    await new Promise(r => {
-        setTimeout(r, 2000)
-        i++;
-    });
-    i++
-    
+   
     return fetch(url, {
         method: "POST",
         headers: headers
@@ -43,28 +37,36 @@ export function IsAuth(usr, pass) {
 }
 
 // appel GET api
-export function ApiFetch (url) {
+export async function ApiFetch (url) {
     let headers = new Headers();
     headers.append('Content-Type', 'application/json; charset=UTF-8');
     headers.append('Authorization', 'Bearer ' + token);
-    
+   
     return fetch(apiURL+'/'+url, {
         method: "GET",
         headers: headers,
-    }).then((response) => {
-        return response.json();
     })
-    .then((data) => {
-        if (data.errorMessage) {
-            throw (data.result + ' : ' + data.errorMessage);
+    .then((response) => {
+        if ( response.status == 401 ) {
+            page.redirect("/auth");
+            throw ("unauthorised");
+        } else if (response.headers.get("content-type").includes("application/json")){
+            return response.json();
         } else {
-            return data;
+            throw (response.statusText + ' : ' + response.text());
+        }
+    })
+    .then((json) => {
+        if (json.errorMessage) {
+            throw (json.result + ' : ' + json.errorMessage);
+        } else {
+            return json
         }
     });
 }
 
 // appel POST/PUT api
-export function ApiPost (url, id, jsPayload) {
+export async function ApiPost (url, id, jsPayload) {
     let headers = new Headers();
     headers.append('Content-Type', 'application/json; charset=UTF-8');
     headers.append('Authorization', 'Bearer ' + token);
@@ -79,23 +81,32 @@ export function ApiPost (url, id, jsPayload) {
         method: verb,
         headers: headers,
         body: JSON.stringify(jsPayload),
-    }).then((response) => {
-        const contentType = response.headers.get("content-type");
-        if (contentType && contentType.indexOf("application/json") !== -1) {
-          return response.json().then(data => {
-            // json
-            if (data.errorMessage) {
-                throw (data.result + ' : ' + data.errorMessage);
+    })
+    .then((response) => {
+        let respJson = response.headers.get("content-type").includes("application/json");
+        if ( response.status < 200 || response.status > 299 ) {
+            //reponse=ko
+            if ( respJson && json.errorMessage ) {
+                return response.json();
             } else {
-                return data
+                throw (response.statusText + ' : ' + response.text());
             }
-          });
         } else {
-          return response.text().then(text => {
-            // this is text, do something with it
-          });
+            //ok
+            if ( respJson ) {
+                return response.json();
+            } else {
+                return {};
+            }
         }
-
+    })
+    .then((json) => {
+        console.log(json);
+        if (json.errorMessage) {
+            throw (json.result + ' : ' + json.errorMessage);
+        } else {
+            return json
+        }
     });
 }
 

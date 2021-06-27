@@ -5,8 +5,8 @@
 
 # 1 - init projet :
 npx degit sveltejs/template XXXXMYPROJECTXXXX
-cd XXXXMYPROJECTXXXX
-npm install
+cd XXXXMYPROJECTXXXX:
+npm install (ou "npm ci" pour installer les exacts même packées que prévue dans package/packages-lock)
 
 In the package.json file, there is a section called "scripts". 
 These scripts define shortcuts for working with your application — dev, build and start. 
