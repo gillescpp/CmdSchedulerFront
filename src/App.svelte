@@ -3,11 +3,9 @@
 	import page from 'page.js'
 	import { mainPages } from './common/page-menu.js'
 	import { IsAuth } from './common/global'
+	import { Right } from './common/global.js'   
 	import Nav from './Nav.svelte'
 	import NotFound from './components/NotFound.svelte'
-
-	//props
-	//export let appTitle = '';
 
 	//routage
 	let currentPage = 0;
@@ -17,13 +15,23 @@
 	for (const item of mainPages) {
 		for (const rt of item.routes) {
 			if ( rt.component ) {
-				page(item.path+rt.path, (ctx) => {
-					if ( !item.public && !IsAuth() ) {
-						page.redirect("/auth")
+				let p = ('/'+item.path);
+				if ( rt.path != '') {
+					p+= ('/'+rt.path);
+				}
+				page(p, (ctx) => {
+					currentRouteParams.Message = '';
+					currentRouteParams.readonly = true;
+					currentRouteParams.params = {};
+					currentRouteParams.page = item;
+					currentPage = 0;
+					if ( (item.path != 'auth') && !IsAuth() ) {
+						page.redirect('/auth')
 					} else {
 						currentPage = item.id;
 						currentCompo = rt.component;
-						currentRouteParams = ctx.params;
+						currentRouteParams.params = ctx.params;
+						currentRouteParams.readonly = Right(item.right).read_only
 					}
 				});	
 			}

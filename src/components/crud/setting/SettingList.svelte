@@ -1,10 +1,12 @@
 <script>
+import { len } from "page.js";
+
     import { onMount } from "svelte";
     import { ApiFetch } from './../../../common/global.js'   
     
     export let routeParams = {};
     const plimit = 10;
-    const apiEP = 'queues';
+    const apiEP = 'cfgs';
     let readonly = routeParams.readonly;
     let wip = true;
     let footMsg = ''
@@ -24,14 +26,20 @@
         let params = new Map()
         params.set("page", p);
         if (search != "") {
-            params.set("lib", "like:"+search);
+            params.set("key", "like:"+search);
         }
         params.set("limit", plimit);
 
         ApiFetch(apiEP, params)
         .then((json) => {
             wip = false;
-            data = json;
+            //data = json;
+            ////////////////// paging pas géré par ce EP !
+            data.data = json;
+            data.totalRecord = data.data.length;
+            data.totalPage  = 1;
+            data.page  = 1;
+            /////////////////
             footMsg = '';
         }) 
         .catch(err => {
@@ -49,14 +57,11 @@
         <table class="pure-table pure-table-striped {wip ? 'disabled' : ''}">
             <thead>
                 <tr>
-                    <th>#</th>
-                    <th>Name</th>
-                    <th>Max Size</th>
-                    <th>Timeout (ms)</th>
-                    <th>State</th>
+                    <th>Clé</th>
+                    <th>Valeur</th>
                 </tr>
                 <tr>
-                    <th colspan=5>
+                    <th colspan=2>
                         <input type="text" id="tinput_search" placeholder="Recherche..." title="Recherche" bind:value={search} on:input={() => setPage(1)}>
                     </th>
                 </tr>
@@ -65,11 +70,8 @@
                 {#if data.data}
                 {#each data.data as item}
                 <tr>
-                    <td><a href={routeParams.page.path+'/'+item.id}>{item.id}</a></td>
-                    <td>{item.lib}</td>
-                    <td>{item.size}</td>
-                    <td>{item.timeout}</td>         
-                    <td>{@html item.paused ? '&#x25A0;' : '&#x23F5;' }</td>     
+                    <td><a href={routeParams.page.path+'/'+encodeURI(item.key)}>{item.key}</a></td>
+                    <td>{item.value}</td>
                 </tr>      
                 {/each} 
                 {/if}
@@ -77,14 +79,14 @@
                 <!-- btn new -->
                 {#if !readonly}
                 <tr>
-                    <td colspan=5>
+                    <td colspan=2>
                         <a href={routeParams.page.path+'/new'} class="">New</a>
                     </td>
                 </tr>                          
                 {/if}
             </tbody>
             <tfoot>
-                <td colspan=5>
+                <td colspan=2>
                     {#if data.totalRecord}
                     Total : {data.totalRecord}.
                     <!-- pagination -->

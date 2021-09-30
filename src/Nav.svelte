@@ -1,35 +1,41 @@
 <script>
 	import { mainPages } from "./common/page-menu"
+	import { Right } from './common/global'
 
 	//elements du menu
-	export let activePage = 0; //fourni par App
-
-	$: isActive = (pgid) => pgid == activePage ? 'selected' : '';
-
-	//prepa seuls elements visible du menu : visibleMnu + 1 compo de réf
 	let mnuView = [];
-	for (const mnu of mainPages) {
-		if ( mnu.visibleMnu ) {
-			for (const el of mnu.routes) {
-				if ( el.component != null ) {
-					mnuView.push(mnu);
-					break;
+	export let activePage = 0; //page active fourni par App
+
+	$: if ( activePage > 0 ) {
+		updateMnu();
+	}
+
+	//prepa seuls elements visible du menu : 
+	function updateMnu() {
+		mnuView = [];
+		for (const mnu of mainPages) {
+			if ( mnu.visibleMnu && Right(mnu.right).allowed ) {
+				for (const el of mnu.routes) {
+					if ( el.component != null ) {
+						let cssC = mnu.id === activePage ? "selected" : "";
+						mnuView.push({
+							cssClass: cssC,
+							href: '/'+mnu.path,
+							name: mnu.name,
+						});
+						break;
+					}
 				}
 			}
 		}
 	}
-
+	
 </script>
 
-<p>
-	{activePage}
-</p>
 <nav>
 	<ul>
 		{#each mnuView as item}
-		{#if item.visibleMnu}
-		<li><a class="{ isActive(item.id) }" href="{item.path}">{item.name}</a></li>
-		{/if}
+		<li><a class="{item.cssClass}" href="{item.href}">{item.name}</a></li>
 		{/each}	
 	</ul>
 </nav>

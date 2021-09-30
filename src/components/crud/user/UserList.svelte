@@ -4,7 +4,7 @@
     
     export let routeParams = {};
     const plimit = 10;
-    const apiEP = 'queues';
+    const apiEP = 'users';
     let readonly = routeParams.readonly;
     let wip = true;
     let footMsg = ''
@@ -24,7 +24,7 @@
         let params = new Map()
         params.set("page", p);
         if (search != "") {
-            params.set("lib", "like:"+search);
+            params.set("name", "like:"+search);
         }
         params.set("limit", plimit);
 
@@ -50,13 +50,12 @@
             <thead>
                 <tr>
                     <th>#</th>
+                    <th>Login</th>
                     <th>Name</th>
-                    <th>Max Size</th>
-                    <th>Timeout (ms)</th>
                     <th>State</th>
                 </tr>
                 <tr>
-                    <th colspan=5>
+                    <th colspan=4>
                         <input type="text" id="tinput_search" placeholder="Recherche..." title="Recherche" bind:value={search} on:input={() => setPage(1)}>
                     </th>
                 </tr>
@@ -66,10 +65,9 @@
                 {#each data.data as item}
                 <tr>
                     <td><a href={routeParams.page.path+'/'+item.id}>{item.id}</a></td>
-                    <td>{item.lib}</td>
-                    <td>{item.size}</td>
-                    <td>{item.timeout}</td>         
-                    <td>{@html item.paused ? '&#x25A0;' : '&#x23F5;' }</td>     
+                    <td>{item.login}</td>
+                    <td>{item.name}</td>
+                    <td>{@html item.deleted ? '&#10008;' : '&#10004;'}</td>
                 </tr>      
                 {/each} 
                 {/if}
@@ -77,14 +75,14 @@
                 <!-- btn new -->
                 {#if !readonly}
                 <tr>
-                    <td colspan=5>
+                    <td colspan=4>
                         <a href={routeParams.page.path+'/new'} class="">New</a>
                     </td>
                 </tr>                          
                 {/if}
             </tbody>
             <tfoot>
-                <td colspan=5>
+                <td colspan=4>
                     {#if data.totalRecord}
                     Total : {data.totalRecord}.
                     <!-- pagination -->

@@ -1,17 +1,32 @@
 //compos pages
 import Home from '../components/Home.svelte'
+import Auth from '../components/Auth.svelte'
 import QueueList from '../components/crud/queue/QueueList.svelte'  
 import QueueEdit from '../components/crud/queue/QueueEdit.svelte'  
-import Auth from '../components/Auth.svelte'
-//import Advanced from '../components/Advanced.svelte'
-//import Users from '../components/users/Users.svelte'  
-import NotFound from '../components/NotFound.svelte'  
+import AgentList from '../components/crud/agent/AgentList.svelte'  
+import AgentEdit from '../components/crud/agent/AgentEdit.svelte'  
+import SchedulerList from '../components/crud/scheduler/SchedulerList.svelte'  
+import SchedulerEdit from '../components/crud/scheduler/SchedulerEdit.svelte'  
+import SettingList from '../components/crud/setting/SettingList.svelte'  
+import SettingEdit from '../components/crud/setting/SettingEdit.svelte'  
+import TagList from '../components/crud/tag/TagList.svelte'  
+import TagEdit from '../components/crud/tag/TagEdit.svelte'  
+import TaskList from '../components/crud/task/TaskList.svelte'  
+import TaskEdit from '../components/crud/task/TaskEdit.svelte'  
+import TaskflowList from '../components/crud/taskflow/TaskflowList.svelte'  
+import TaskflowEdit from '../components/crud/taskflow/TaskflowEdit.svelte'  
+import UserList from '../components/crud/user/UserList.svelte'  
+import UserEdit from '../components/crud/user/UserEdit.svelte'  
 
 //def des pages
 export const mainPages = [
     { 
-        id: 1, name: 'Dashboard', 
-        path: '/',
+        id: 1, 
+        name: 'Dashboard', 
+        path: '',
+        right: '',
+        entity: '',
+        apiEP: '',
         routes: [
             {
                 path: '',
@@ -19,119 +34,165 @@ export const mainPages = [
             }
         ],
         visibleMnu: true,
-        public: false 
     },
     { 
         id: 2, 
         name: 'Scheduler', 
-        path: '/scheduler', 
+        path: 'scheduler', 
+        right: 'SCHED',
+        entity: 'SCHED',
+        apiEP: 'scheds',
         routes: [
             {
                 path: '',
-                component: null
+                component: SchedulerList
+            },
+            {
+                path: ':id',
+                component: SchedulerEdit
             }
         ],
         visibleMnu: true,
-        public: false
     },
     { 
         id: 3, 
         name: 'TaskFlows', 
-        path: '/taskflow', 
+        path: 'taskflow', 
+        right: 'TASKFLOW',
+        entity: 'TASKFLOW',
+        apiEP: 'taskflows',
         routes: [
             {
                 path: '',
-                component: null
+                component: TaskflowList
+            },
+            {
+                path: ':id',
+                component: TaskflowEdit
             }
         ],
         visibleMnu: true,
-        public: false
     },
     { 
         id: 4, 
         name: 'Tasks', 
-        path: '/task', 
+        path: 'task', 
+        right: 'TASK',
+        entity: 'TASK',
+        apiEP: 'tasks',
         routes: [
             {
                 path: '',
-                component: null
+                component: TaskList
+            },
+            {
+                path: ':id',
+                component: TaskEdit
             }
         ],
         visibleMnu: true,
-        public: false 
     },
     { 
         id: 5, 
         name: 'Users', 
-        path: '/user', 
+        path: 'user', 
+        right: 'USER',
+        entity: 'USER',
+        apiEP: 'users',
         routes: [
             {
                 path: '',
-                component: null
+                component: UserList
+            },
+            {
+                path: ':id',
+                component: UserEdit
             }
         ],
         visibleMnu: true,
-        public: false
     },
     { 
         id: 6, 
         name: 'Tags', 
-        path: '/tag', 
+        path: 'tag', 
+        right: 'TAGS',
+        entity: 'TAGS',
+        apiEP: 'tags',
         routes: [
             {
                 path: '',
-                component: null
+                component: TagList
+            },
+            {
+                path: ':id',
+                component: TagEdit
             }
         ],
         visibleMnu: true,
-        public: false
     },
     { 
         id: 7, 
         name: 'Queues', 
-        path: '/queue', 
+        path: 'queue', 
+        right: 'QUEUE',
+        entity: 'QUEUE',
+        apiEP: 'queues',
         routes: [
             {
                 path: '',
                 component: QueueList
             },
             {
-                path: '/:id',
+                path: ':id',
                 component: QueueEdit
             }
         ],
         visibleMnu: true,
-        public: false
     },
     { 
         id: 8, 
         name: 'Agents', 
-        path: '/agent', 
+        path: 'agent', 
+        right: 'AGENT',
+        entity: 'AGENT',
+        apiEP: 'agents',
         routes: [
             {
                 path: '',
-                component: null
+                component: AgentList
+            },
+            {
+                path: ':id',
+                component: AgentEdit
             }
         ],
         visibleMnu: true,
-        public: false
     },
     { 
         id: 9, 
         name: 'Setting', 
-        path: '/setting', 
+        path: 'setting', 
+        right: 'CONFIG',
+        entity: 'CONFIG',
+        apiEP: 'cfgs',
         routes: [
             {
                 path: '',
-                component: null
+                component: SettingList
+            },
+            {
+                path: ':id',
+                component: SettingEdit
             }
         ],
         visibleMnu: true,
-        public: false
     },
     { 
         id: 10, name: 'Authentification', 
-        path: '/auth',
+        path: 'auth',
+        right: '',
+        entity: '',
+        apiEP: 'auth',
         routes: [
             {
                 path: '',
@@ -139,7 +200,6 @@ export const mainPages = [
             }
         ],
         visibleMnu: false,
-        public: true
     },
 ]
 

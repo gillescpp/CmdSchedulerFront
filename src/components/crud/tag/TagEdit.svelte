@@ -5,7 +5,7 @@
     import page from 'page.js' 
     import { fade } from 'svelte/transition';
 
-	const apiEP = 'queues';
+	const apiEP = 'tags';
     export let routeParams = {};
     let readonly = routeParams.readonly;
     let wip = true;
@@ -91,19 +91,9 @@
                     <span class="pure-form-message-inline">required & unique.</span>
                 </div>
                 <div class="pure-control-group">
-                    <label for="size">Max Size</label>
-                    <input type="number" id="size" readonly={readonly} bind:value="{data.size}" autocomplete="off" />
-                </div>
-                <div class="pure-control-group">
-                    <label for="timeout">Timeout (ms)</label>
-                    <input type="number" id="timeout" readonly={readonly} bind:value="{data.timeout}" autocomplete="off" />
-                </div>
-                <div class="pure-control-group">
-                    <label for="paused">Paused</label>
-                    <input type="checkbox" id="paused" readonly={readonly} bind:checked="{data.paused}" />
-                    {#if data.paused}
-                    since <span class="pure-form-message">{data.paused_from}</span>    
-                    {/if}
+                    <label for="group">Group</label>
+                    <input type="text" id="group" readonly={readonly} bind:value="{data.group}" placeholder="group" autocomplete="off" />
+                    <span class="pure-form-message-inline">required.</span>
                 </div>
                 <div class="pure-control-group">
                     <span class="pure-form-message">{data.info}</span>    

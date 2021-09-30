@@ -4,7 +4,7 @@
     
     export let routeParams = {};
     const plimit = 10;
-    const apiEP = 'queues';
+    const apiEP = 'tags';
     let readonly = routeParams.readonly;
     let wip = true;
     let footMsg = ''
@@ -50,13 +50,11 @@
             <thead>
                 <tr>
                     <th>#</th>
-                    <th>Name</th>
-                    <th>Max Size</th>
-                    <th>Timeout (ms)</th>
-                    <th>State</th>
+                    <th>Nom</th>
+                    <th>Groupe</th>
                 </tr>
                 <tr>
-                    <th colspan=5>
+                    <th colspan=3>
                         <input type="text" id="tinput_search" placeholder="Recherche..." title="Recherche" bind:value={search} on:input={() => setPage(1)}>
                     </th>
                 </tr>
@@ -67,9 +65,7 @@
                 <tr>
                     <td><a href={routeParams.page.path+'/'+item.id}>{item.id}</a></td>
                     <td>{item.lib}</td>
-                    <td>{item.size}</td>
-                    <td>{item.timeout}</td>         
-                    <td>{@html item.paused ? '&#x25A0;' : '&#x23F5;' }</td>     
+                    <td>{item.group}</td>
                 </tr>      
                 {/each} 
                 {/if}
@@ -77,14 +73,14 @@
                 <!-- btn new -->
                 {#if !readonly}
                 <tr>
-                    <td colspan=5>
+                    <td colspan=3>
                         <a href={routeParams.page.path+'/new'} class="">New</a>
                     </td>
                 </tr>                          
                 {/if}
             </tbody>
             <tfoot>
-                <td colspan=5>
+                <td colspan=3>
                     {#if data.totalRecord}
                     Total : {data.totalRecord}.
                     <!-- pagination -->

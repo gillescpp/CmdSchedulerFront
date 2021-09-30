@@ -1,12 +1,11 @@
-import { writable } from 'svelte/store'
+//import { writable } from 'svelte/store'
 import page from 'page.js'
 
 export const apiURL = "http://localhost:8100/cmdscheduler"
-export const activeTab = writable("");
-
 
 //token en cours
-let token = ''
+let token = '';
+let rights = '';
 
 // authentification
 export async function Auth(usr, pass) {
@@ -19,30 +18,63 @@ export async function Auth(usr, pass) {
         method: "POST",
         headers: headers
     }).then((response) => {
-        return response.json()
+        return response.json();
     })
     .then((data) => {
-        if (data.errorMessage) {
+        if (data.result !== undefined) {
             throw (data.result + ' : ' + data.errorMessage);
         } else {
-            token = data.token
-            return
+            token = data.token;
+            rights = data.rights;
+            return;
         }
     });
 }
 
 //check présence token
-export function IsAuth(usr, pass) {
-    return !(token=="")
+export function IsAuth() {
+    return !(token=="");
+}
+
+//ras token
+export function ClearToken() {
+    token = "";
+}
+
+// recup drtoi associé a un code fonction
+export function Right(code) {
+    if ( code == "" ) {
+        return {
+            allowed: true,
+            read_only: true
+        };        
+    } else if ( IsAuth() && rights ) {
+        for (let k in rights) {
+            if (k === code) { 
+              return rights[k]; 
+            }
+        } 
+    } 
+    return {
+        allowed: false,
+        read_only: true
+    };
 }
 
 // appel GET api
-export async function ApiFetch (url) {
+export async function ApiFetch (entryPoint, params) {
     let headers = new Headers();
     headers.append('Content-Type', 'application/json; charset=UTF-8');
     headers.append('Authorization', 'Bearer ' + token);
+
+    const apiget = new URL(apiURL+'/'+entryPoint);
+    if ( params ) {
+        for (let [k, v] of params) {
+            apiget.searchParams.append(k, v);
+        }
+    }
    
-    return fetch(apiURL+'/'+url, {
+    return fetch(apiget.href, {
         method: "GET",
         headers: headers,
     })
@@ -83,25 +115,18 @@ export async function ApiPost (url, id, jsPayload) {
         body: JSON.stringify(jsPayload),
     })
     .then((response) => {
-        let respJson = response.headers.get("content-type").includes("application/json");
-        if ( response.status < 200 || response.status > 299 ) {
-            //reponse=ko
-            if ( respJson && json.errorMessage ) {
-                return response.json();
-            } else {
-                throw (response.statusText + ' : ' + response.text());
-            }
+        if ( response.status == 401 ) {
+            page.redirect("/auth");
+            throw ("unauthorised");
+        } else if (response.headers.get("content-type").includes("application/json")) {
+            return response.json();
+        } else if ( response.status < 200 || response.status > 299 ) {
+            throw (response.statusText + ' : ' + response.text());
         } else {
-            //ok
-            if ( respJson ) {
-                return response.json();
-            } else {
-                return {};
-            }
+            return {};
         }
     })
     .then((json) => {
-        console.log(json);
         if (json.errorMessage) {
             throw (json.result + ' : ' + json.errorMessage);
         } else {
@@ -109,16 +134,3 @@ export async function ApiPost (url, id, jsPayload) {
         }
     });
 }
-
-/*
-async function myFetch(myRequest) {
-  try {
-    const reponse = await fetch(myRequest); // Fetch the resource
-    const text = await response.text(); // Parse it as text
-    const data = JSON.parse(text); // Try to parse it as json
-    // Do your JSON handling here
-  } catch(err) {
-    // This probably means your response is text, do you text handling here
-  }
-}
-*/

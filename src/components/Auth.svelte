@@ -1,26 +1,37 @@
 <script>
-    import { Auth, IsAuth } from '../common/global'
     import page from 'page.js'
-	//export let routeParams = {}
+    import { onMount } from "svelte";
+    import { Auth, ClearToken } from '../common/global'
+
+	export let routeParams = {}
     let user = '';
     let password = '';
-    let errMsg = '';
-    let errMsgClass = '';
+    let footMsg = '';
+    let footMsgClass = '';
+
+    onMount(async function() {
+        ClearToken();
+        //message fourni en param
+        if ( routeParams && routeParams.Message != "" ) {
+            footMsg = routeParams.Message;
+            footMsgClass = 'info';            
+        }
+    });
 
     async function handleSubmit() {
-        errMsg = '...';
-        errMsgClass = '';
+        footMsg = '...';
+        footMsgClass = '';
 
         var authbt = document.getElementById("authbt");
         authbt.disabled = true;
         await Auth(user, password)
             .then(() => {
-                errMsg = ''
+                footMsg = ''
                 page.redirect('/');
             }) 
             .catch(err => {
-                errMsgClass = 'error';
-                errMsg = err;
+                footMsgClass = 'error';
+                footMsg = err;
             });
         authbt.disabled = false;
 	}
@@ -44,7 +55,7 @@
                 <div class="pure-controls">
                     <button type="submit" class="pure-button pure-button-primary" id="authbt">Login</button>
                 </div>
-                <span class="pure-form-message {errMsgClass}">{errMsg}.</span>
+                <span class="pure-form-message {footMsgClass}">{footMsg}.</span>
             </fieldset>
         </form>
     </div>

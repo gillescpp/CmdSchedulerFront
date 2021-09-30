@@ -5,7 +5,7 @@
     import page from 'page.js' 
     import { fade } from 'svelte/transition';
 
-	const apiEP = 'queues';
+	const apiEP = 'agents';
     export let routeParams = {};
     let readonly = routeParams.readonly;
     let wip = true;
@@ -13,6 +13,7 @@
     let footMsgClass = '';
     let id = 0; //0=nouveau
     let data = NewModel(routeParams.page.entity);
+    let evaldata = NewModel(routeParams.page.entity);
 
     if ( routeParams.params.id > 0 ) {
         id = routeParams.params.id;
@@ -45,7 +46,30 @@
         }
     }
 
-    //hanfle submit
+    //evaluate
+    function handleEvaluate(event) {
+        wip = true;
+
+        ApiPost(apiEP+'/eval', 0, data)
+            .then((resp) => {
+                evaldata = resp;
+
+                wip = false;
+            }) 
+            .catch(err => {
+                footMsgClass = 'error';
+                footMsg = err;
+                wip = false;
+                setTimeout(
+                    () => {
+                        footMsg = '';
+                        footMsgClass = '';
+                    }, 2000
+                );
+            });
+    }
+
+    //save
     function handleSubmit(event) {
         wip = true;
 
@@ -86,28 +110,42 @@
         <form on:submit|preventDefault="{handleSubmit}" class="pure-form pure-form-aligned {wip ? 'disabled' : ''}">
             <fieldset>
                 <div class="pure-control-group">
-                    <label for="lib">Name</label>
-                    <input type="text" id="lib" readonly={readonly} bind:value="{data.lib}" placeholder="name" autocomplete="off" />
-                    <span class="pure-form-message-inline">required & unique.</span>
+                    <label for="host">Host</label>
+                    <input type="text" id="host" readonly={readonly} bind:value="{data.host}" placeholder="host" autocomplete="off" />
+                    <button type="button" class="pure-button {wip ? 'disabled' : ''}" on:click="{handleEvaluate}">Evaluate</button>    
+                </div>
+                {#if (evaldata.evalresultinfo!="")}
+                <div class="pure-controls">
+                    <label for="evalok1">Ping</label>
+                    <input type="checkbox" id="evalok1" disabled="disabled" bind:checked="{evaldata.evalresultaccess}" />
+                    <label for="evalok2">Authentication</label>
+                    <input type="checkbox" id="evalok2" disabled="disabled" bind:checked="{evaldata.evalresultauth}" />
+                    <label for="evalok3">Certificate</label>
+                    <input type="checkbox" id="evalok3" disabled="disabled" bind:checked="{evaldata.evalresultcert}" />                   
+                </div>
+                <div class="pure-controls">
+                    Eval response: <span class="pure-form-message">{evaldata.evalresultinfo}</span> 
+                </div>                
+                <div class="pure-controls">
+                    Cert sign: <span class="pure-form-message">{evaldata.certsigneval}</span> 
+                </div>                
+                {/if}
+                <div class="pure-control-group">
+                    <label for="apikey">Api key</label>
+                    <input type="text" id="apikey" readonly={readonly} bind:value="{data.apikey}" placeholder="api key" autocomplete="off" />
+                </div>
+
+                <div class="pure-control-group">
+                    <label for="certsign">Approved certsign</label>
+                    <input type="text" id="certsign" readonly={readonly} bind:value="{data.certsign}" placeholder="approved cert sign" autocomplete="off" />
                 </div>
                 <div class="pure-control-group">
-                    <label for="size">Max Size</label>
-                    <input type="number" id="size" readonly={readonly} bind:value="{data.size}" autocomplete="off" />
+                    <label for="activ">Disabled</label>
+                    <input type="checkbox" id="activ" readonly={readonly} bind:checked="{data.deleted}" />
                 </div>
-                <div class="pure-control-group">
-                    <label for="timeout">Timeout (ms)</label>
-                    <input type="number" id="timeout" readonly={readonly} bind:value="{data.timeout}" autocomplete="off" />
-                </div>
-                <div class="pure-control-group">
-                    <label for="paused">Paused</label>
-                    <input type="checkbox" id="paused" readonly={readonly} bind:checked="{data.paused}" />
-                    {#if data.paused}
-                    since <span class="pure-form-message">{data.paused_from}</span>    
-                    {/if}
-                </div>
-                <div class="pure-control-group">
-                    <span class="pure-form-message">{data.info}</span>    
-                </div>
+                <div class="pure-controls">
+                    <span class="pure-form-message">{data.info}</span> 
+                </div> 
                 <div class="pure-controls">
                     <a href={'/'+routeParams.page.path} class="pure-button">Liste</a>
                     {#if !readonly}
