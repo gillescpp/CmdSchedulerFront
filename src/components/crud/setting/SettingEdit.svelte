@@ -76,36 +76,40 @@
 </script>
 
 <main>
-    <div class="content">
-        {#if id==''}
-        <h3>{routeParams.page.name} : Création</h3>
-        {:else}
-        <h3>{routeParams.page.name} {data.key}</h3>
-        {/if}       
+    <div class="header-small">
+        <div class="items">
+            <h1 class="subhead">
+                {#if data.key==""}
+                <h3>{routeParams.page.name} : New</h3>
+                {:else}
+                <h3>{routeParams.page.name} {data.key}</h3>
+                {/if}  
+            </h1>    
 
-        <form on:submit|preventDefault="{handleSubmit}" class="pure-form pure-form-aligned {wip ? 'disabled' : ''}">
-            <fieldset>
-                <div class="pure-control-group">
-                    <label for="key">Clé</label>
-                    <input type="text" id="key" readonly={readonly || (id!='')} bind:value="{data.key}" placeholder="key" autocomplete="off" />
-                    <span class="pure-form-message-inline">required & unique.</span>
-                </div>
-                <div class="pure-control-group">
-                    <label for="val">Disabled</label>
-                    <input type="text" id="val" readonly={readonly} bind:value="{data.value}" placeholder="value" autocomplete="off" />
-                </div>
-                <div class="pure-controls">
-                    <a href={'/'+routeParams.page.path} class="pure-button">Liste</a>
-                    {#if !readonly}
-                    <button type="submit" class="pure-button pure-button-primary">Save</button>
-                    {/if}       
-                </div>
-            </fieldset>
-        </form>
+            <form on:submit|preventDefault="{handleSubmit}" class="pure-form pure-form-aligned {wip ? 'disabled' : ''}">
+                <fieldset>
+                    <div class="pure-control-group">
+                        <label for="key">Clé</label>
+                        <input type="text" id="key" readonly={readonly || (id!='')} bind:value="{data.key}" placeholder="key" autocomplete="off" />
+                        <span class="pure-form-message-inline">required & unique.</span>
+                    </div>
+                    <div class="pure-control-group">
+                        <label for="val">Disabled</label>
+                        <input type="text" id="val" readonly={readonly} bind:value="{data.value}" placeholder="value" autocomplete="off" />
+                    </div>
+                    <div class="pure-controls">
+                        <a href={'/'+routeParams.page.path} class="pure-button">Liste</a>
+                        {#if !readonly}
+                        <button type="submit" class="pure-button pure-button-primary">Save</button>
+                        {/if}       
+                    </div>
+                </fieldset>
+            </form>
 
-        {#if (footMsg!="")}
-        <span class="pure-form-message {footMsgClass}" out:fade|local>{footMsg}</span>    
-        {/if}
+            {#if (footMsg!="")}
+            <span class="pure-form-message {footMsgClass}" out:fade|local>{footMsg}</span>    
+            {/if}
+        </div>
     </div>
 </main>
 

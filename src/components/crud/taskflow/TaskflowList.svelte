@@ -44,58 +44,58 @@
 </script>
 
 <main>
-    <div class="content">
-        <!-- liste -->
-        <table class="pure-table pure-table-striped {wip ? 'disabled' : ''}">
-            <thead>
-                <tr>
-                    <th>#</th>
-                    <th>Nom</th>
-                    <th>Actif</th>
-                </tr>
-                <tr>
-                    <th colspan=3>
-                        <input type="text" id="tinput_search" placeholder="Recherche..." title="Recherche" bind:value={search} on:input={() => setPage(1)}>
-                    </th>
-                </tr>
-            </thead>
-            <tbody>
-                {#if data.data}
-                {#each data.data as item}
-                <tr>
-                    <td><a href={routeParams.page.path+'/'+item.id}>{item.id}</a></td>
-                    <td>{item.lib}</td>
-                    <td>{@html item.activ ? '&#10004;' : '&#10008;'}</td>
-                </tr>      
-                {/each} 
-                {/if}
+    <div class="header-small">
 
-                <!-- btn new -->
+        <div class="items">
+            <h1 class="subhead">Taskflow List
                 {#if !readonly}
-                <tr>
-                    <td colspan=3>
-                        <a href={routeParams.page.path+'/new'} class="">New</a>
-                    </td>
-                </tr>                          
+                <a class="pure-button button-small button-secondary" href={routeParams.page.path+'/new'}>Add New</a>
                 {/if}
-            </tbody>
-            <tfoot>
-                <td colspan=3>
-                    {#if data.totalRecord}
-                    Total : {data.totalRecord}.
-                    <!-- pagination -->
-                    {#if ( data.totalPage > 0 )}
-                    Pages :
-                    {#each Array(data.totalPage) as _, p}
-                    &nbsp; <a href={'#'} class="{data.page === (p+1) ? 'pagination active' : 'pagination'}" on:click|preventDefault={() => setPage(p+1)}>{p+1}</a>
-                    {/each}
+            </h1>
+
+            <!-- liste -->
+            <table class="pure-table pure-table-striped {wip ? 'disabled' : ''}">
+                <thead>
+                    <tr>
+                        <th>#</th>
+                        <th>Name</th>
+                        <th>Activ</th>
+                    </tr>
+                    <tr>
+                        <th colspan=3>
+                            <input type="text" id="tinput_search" placeholder="Search" title="Search" bind:value={search} on:input={() => setPage(1)}>
+                        </th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {#if data.data}
+                    {#each data.data as item}
+                    <tr>
+                        <td><a href={routeParams.page.path+'/'+item.id}>{item.id}</a></td>
+                        <td>{item.lib}</td>
+                        <td>{@html item.activ ? '&#10004;' : '&#10008;'}</td>
+                    </tr>      
+                    {/each} 
                     {/if}
-                    {/if}
-                </td>
-            </tfoot>
-        </table>
-        
-        <span class="pure-form-message {footMsgClass}">{footMsg}</span>
+                </tbody>
+                <tfoot>
+                    <td colspan=3>
+                        {#if data.totalRecord}
+                        Total : {data.totalRecord}.
+                        <!-- pagination -->
+                        {#if ( data.totalPage > 0 )}
+                        Pages :
+                        {#each Array(data.totalPage) as _, p}
+                        &nbsp; <a href={'#'} class="{data.page === (p+1) ? 'pagination active' : 'pagination'}" on:click|preventDefault={() => setPage(p+1)}>{p+1}</a>
+                        {/each}
+                        {/if}
+                        {/if}
+                    </td>
+                </tfoot>
+            </table>
+            
+            <span class="pure-form-message {footMsgClass}">{footMsg}</span>
+        </div>
     </div>
 </main>
 

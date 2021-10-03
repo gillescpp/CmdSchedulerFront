@@ -76,40 +76,44 @@
 </script>
 
 <main>
-    <div class="content">
-        {#if id<=0}
-        <h3>{routeParams.page.name} : Création</h3>
-        {:else}
-        <h3>{routeParams.page.name} n° {data.id}</h3>
-        {/if}       
+    <div class="header-small">
+        <div class="items">
+            <h1 class="subhead">
+                {#if id<=0}
+                <h3>{routeParams.page.name} : New</h3>
+                {:else}
+                <h3>{routeParams.page.name} n° {data.id}</h3>
+                {/if}  
+            </h1>     
 
-        <form on:submit|preventDefault="{handleSubmit}" class="pure-form pure-form-aligned {wip ? 'disabled' : ''}">
-            <fieldset>
-                <div class="pure-control-group">
-                    <label for="lib">Name</label>
-                    <input type="text" id="lib" readonly={readonly} bind:value="{data.lib}" placeholder="name" autocomplete="off" />
-                    <span class="pure-form-message-inline">required & unique.</span>
-                </div>
-                <div class="pure-control-group">
-                    <label for="group">Group</label>
-                    <input type="text" id="group" readonly={readonly} bind:value="{data.group}" placeholder="group" autocomplete="off" />
-                    <span class="pure-form-message-inline">required.</span>
-                </div>
-                <div class="pure-control-group">
-                    <span class="pure-form-message">{data.info}</span>    
-                </div>
-                <div class="pure-controls">
-                    <a href={'/'+routeParams.page.path} class="pure-button">Liste</a>
-                    {#if !readonly}
-                    <button type="submit" class="pure-button pure-button-primary">Save</button>
-                    {/if}       
-                </div>
-            </fieldset>
-        </form>
+            <form on:submit|preventDefault="{handleSubmit}" class="pure-form pure-form-aligned {wip ? 'disabled' : ''}">
+                <fieldset>
+                    <div class="pure-control-group">
+                        <label for="lib">Name</label>
+                        <input type="text" id="lib" readonly={readonly} bind:value="{data.lib}" placeholder="name" autocomplete="off" />
+                        <span class="pure-form-message-inline">required & unique.</span>
+                    </div>
+                    <div class="pure-control-group">
+                        <label for="group">Group</label>
+                        <input type="text" id="group" readonly={readonly} bind:value="{data.group}" placeholder="group" autocomplete="off" />
+                        <span class="pure-form-message-inline">required.</span>
+                    </div>
+                    <div class="pure-control-group">
+                        <span class="pure-form-message">{data.info}</span>    
+                    </div>
+                    <div class="pure-controls">
+                        <a href={'/'+routeParams.page.path} class="pure-button">Liste</a>
+                        {#if !readonly}
+                        <button type="submit" class="pure-button pure-button-primary">Save</button>
+                        {/if}       
+                    </div>
+                </fieldset>
+            </form>
 
-        {#if (footMsg!="")}
-        <span class="pure-form-message {footMsgClass}" out:fade|local>{footMsg}</span>    
-        {/if}
+            {#if (footMsg!="")}
+            <span class="pure-form-message {footMsgClass}" out:fade|local>{footMsg}</span>    
+            {/if}
+        </div>
     </div>
 </main>
 

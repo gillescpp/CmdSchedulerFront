@@ -14,7 +14,7 @@
         //message fourni en param
         if ( routeParams && routeParams.Message != "" ) {
             footMsg = routeParams.Message;
-            footMsgClass = 'info';            
+            footMsgClass = 'success';            
         }
     });
 
@@ -39,26 +39,42 @@
 </script>
 
 <main>
-    <div class="content">
-        <form on:submit|preventDefault="{handleSubmit}" class="pure-form pure-form-aligned" id="authform">
-            <legend>Identification</legend>
-            <fieldset>
-                <div class="pure-control-group">
-                    <label for="lib">Login</label>
-                    <input type="text" id="login" bind:value="{user}" placeholder="login" autocomplete="off" />
-                    <span class="pure-form-message-inline"></span>
-                </div>
-                <div class="pure-control-group">
-                    <label for="size">Password</label>
-                    <input type="password" id="password" bind:value="{password}" placeholder="password" autocomplete="off" />
-                </div>
-                <div class="pure-controls">
-                    <button type="submit" class="pure-button pure-button-primary" id="authbt">Login</button>
-                </div>
-                <span class="pure-form-message {footMsgClass}">{footMsg}.</span>
-            </fieldset>
-        </form>
-    </div>
+    <div class="header-medium">
+
+        <div class="items">
+            <h1 class="subhead">Login</h1>
+
+            <aside class="pure-message message-{footMsgClass}">
+                <p>{footMsg}</p>
+            </aside>
+            <form on:submit|preventDefault="{handleSubmit}" class="pure-form pure-form-stacked" id="authform">
+                <fieldset>
+
+                    <label for="login">Login</label>
+                    <input id="login" type="text" bind:value="{user}" placeholder="Login" class="pure-input-1">
+
+                    <label for="password">Password</label>
+                    <input id="password" type="password" bind:value="{password}" placeholder="Password" class="pure-input-1">
+
+                    <!--
+                    <label for="remember" class="pure-checkbox">
+                        <input id="remember" type="checkbox" value="1"> Remember me
+                    </label>
+                    -->
+
+                    <button id="authbt" type="submit" class="pure-button button-success">Sign in</button>
+                </fieldset>
+            </form>
+        </div>
+
+        <div class="footer">
+            <div class="pure-menu pure-menu-horizontal">
+                <ul>
+                    <!-- <li class="pure-menu-item"><a href="http://purecss.io/" class="pure-menu-link">PURE CSS</a></li> -->
+                </ul>
+            </div>
+        </div>
+    </div>    
 </main>
 
 <style>

@@ -63,23 +63,22 @@
 
 </script>
 
-<Nav activePage={currentPage} />
 
 <main>
-	{#if currentPage === 0}
-	Not Found.
-	{:else }
-	<svelte:component this={currentCompo} routeParams={currentRouteParams}/>
-	{/if}
-	<!--
-	{#if currentPage === 'About'}
-	<About/>
-	{:else if currentPage === 'XXX'}
-	<About/>
-	{:else}
-	<Home/>
-	{/if}
-	-->
+
+	<div id="layout" class="pure-g">
+		<div class="sidebar pure-u-1-5">
+			<Nav activePage={currentPage} />
+		</div>
+	
+		<div class="content pure-u-4-5">
+			{#if currentPage === 0}
+			Not Found.
+			{:else }
+			<svelte:component this={currentCompo} routeParams={currentRouteParams}/>
+			{/if}
+		</div>
+	</div>
 
 </main>
 

@@ -149,7 +149,7 @@ puis dans les compos : Decrementer.svelte
 <Resetter/>
 
 
-On peu aussi utiliser du system d'auto subcribre avec le sighne $
+On peu aussi utiliser du system d'auto subcribre avec le signe $
 ---------------App.svelte
 <script>
 	import { count } from './stores.js';

@@ -56,7 +56,7 @@ export const mainPages = [
     },
     { 
         id: 3, 
-        name: 'TaskFlows', 
+        name: 'TaskFlow', 
         path: 'taskflow', 
         right: 'TASKFLOW',
         entity: 'TASKFLOW',
@@ -75,7 +75,7 @@ export const mainPages = [
     },
     { 
         id: 4, 
-        name: 'Tasks', 
+        name: 'Task', 
         path: 'task', 
         right: 'TASK',
         entity: 'TASK',
@@ -94,7 +94,7 @@ export const mainPages = [
     },
     { 
         id: 5, 
-        name: 'Users', 
+        name: 'User', 
         path: 'user', 
         right: 'USER',
         entity: 'USER',
@@ -113,7 +113,7 @@ export const mainPages = [
     },
     { 
         id: 6, 
-        name: 'Tags', 
+        name: 'Tag', 
         path: 'tag', 
         right: 'TAGS',
         entity: 'TAGS',
@@ -132,7 +132,7 @@ export const mainPages = [
     },
     { 
         id: 7, 
-        name: 'Queues', 
+        name: 'Queue', 
         path: 'queue', 
         right: 'QUEUE',
         entity: 'QUEUE',
@@ -151,7 +151,7 @@ export const mainPages = [
     },
     { 
         id: 8, 
-        name: 'Agents', 
+        name: 'Agent', 
         path: 'agent', 
         right: 'AGENT',
         entity: 'AGENT',
