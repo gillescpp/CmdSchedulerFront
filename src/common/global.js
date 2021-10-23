@@ -1,7 +1,8 @@
 //import { writable } from 'svelte/store'
 import page from 'page.js'
 
-export const apiURL = "http://localhost:8100/cmdscheduler"
+export const baseURL = window.location.origin;
+export const apiURL = baseURL + "/cmdscheduler";
 
 //token en cours
 let token = '';

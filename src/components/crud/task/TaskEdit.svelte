@@ -172,7 +172,7 @@
                         <label for="ExecOn">ExecOn</label>
 
                         {#each data.exec_on as e, idx}
-                        <input type="text" id="ExecOn{idx}" readonly={readonly} bind:value="{e}" placeholder="agent num" autocomplete="off" />    
+                        <input type="number" id="ExecOn{idx}" readonly={readonly} bind:value="{e}" placeholder="agent num" autocomplete="off" />    
                         {/each}
                         <a href="#+" on:click="{() => appendExecOn()}">+</a> /
                         <a href="#-" on:click="{() => removeExecOn()}">-</a>
