@@ -142,9 +142,8 @@
                             <input type="number" id="interval{d}" bind:value="{data.detail[d].interval}" min="1" max="86400" placeholder="intervalle" autocomplete="off" />
                         </div>
                         <div class="pure-control-group">
-                            <label for="intervalhours{d}">Times slot</label>
+                            <label for="intervalhours{d}" title="ex: 08:00:05-10:00:00,14:00:00-18:00:00">Times slot</label>
                             <input type="text" id="intervalhours{d}" readonly={readonly} bind:value="{data.detail[d].intervalhours}" placeholder="08:00:05-12:00:00,..." autocomplete="off" />
-                            <span class="pure-form-message">ex: 08:00:05-10:00:00,14:00:00-18:00:00</span>    
                         </div>
                         {:else}
                         <!-- heures -->
