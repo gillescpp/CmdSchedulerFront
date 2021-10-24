@@ -3,7 +3,7 @@
     import { ApiFetch } from './../../../common/global.js'   
     
     export let routeParams = {};
-    const plimit = 10;
+    const plimit = 20;
     const apiEP = 'tasks';
     let readonly = routeParams.readonly;
     let wip = true;

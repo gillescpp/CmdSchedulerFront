@@ -5,7 +5,8 @@
   "scripts": {
     "build": "rollup -c",
     "dev": "rollup -c -w",
-    "start": "sirv public --single --no-clear"
+    "start_old": "sirv public --single --no-clear",
+    "start": "caddy_windows_amd64.exe run"
   },
   "devDependencies": {
     "@rollup/plugin-commonjs": "^17.0.0",

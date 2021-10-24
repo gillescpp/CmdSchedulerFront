@@ -18,8 +18,20 @@ export async function Auth(usr, pass) {
     return fetch(url, {
         method: "POST",
         headers: headers
-    }).then((response) => {
-        return response.json();
+    })
+    .then((response) => {
+        let contentJS = false;
+        if ( response.headers.get("content-type") ) {
+            contentJS = ( response.headers.get("content-type").indexOf("application/json") !== -1);
+        }      
+        if (contentJS) {
+            return response.json();
+        } else {
+            return response.text().then(data => ({
+                errorMessage: response.statusText,
+                result: response.status
+            }));
+        }
     })
     .then((data) => {
         if (data.result !== undefined) {
@@ -80,13 +92,18 @@ export async function ApiFetch (entryPoint, params) {
         headers: headers,
     })
     .then((response) => {
+        let contentJS = false;
+        if ( response.headers.get("content-type") ) {
+            contentJS = ( response.headers.get("content-type").indexOf("application/json") !== -1);
+        }  
+
         if ( response.status == 401 ) {
             page.redirect("/auth");
             throw ("unauthorised");
-        } else if (response.headers.get("content-type").includes("application/json")){
+        } else if (contentJS){
             return response.json();
         } else {
-            throw (response.statusText + ' : ' + response.text());
+            throw (response.status + " : " + response.statusText);
         }
     })
     .then((json) => {
@@ -116,13 +133,18 @@ export async function ApiPost (url, id, jsPayload) {
         body: JSON.stringify(jsPayload),
     })
     .then((response) => {
+        let contentJS = false;
+        if ( response.headers.get("content-type") ) {
+            contentJS = ( response.headers.get("content-type").indexOf("application/json") !== -1);
+        }  
+
         if ( response.status == 401 ) {
             page.redirect("/auth");
             throw ("unauthorised");
-        } else if (response.headers.get("content-type").includes("application/json")) {
+        } else if (contentJS) {
             return response.json();
         } else if ( response.status < 200 || response.status > 299 ) {
-            throw (response.statusText + ' : ' + response.text());
+            throw (response.statusText + ' : ' + response.statusText);
         } else {
             return {};
         }

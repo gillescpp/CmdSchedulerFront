@@ -3,7 +3,6 @@
     import { NewModel } from './../../../common/model.js'
     import { ApiFetch, ApiPost } from './../../../common/global.js'  
     import page from 'page.js' 
-    import { fade } from 'svelte/transition';
 
 	const apiEP = 'taskflows';
     export let routeParams = {};
@@ -12,6 +11,9 @@
     let footMsg = '';
     let footMsgClass = '';
     let id = 0; //0=nouveau
+    let queues = [];
+    let scheds = [];
+    let tasks = [];
     let data = NewModel(routeParams.page.entity);
     let dNamedArgs = []; //intermédaire pour named_args (object kv)
 
@@ -27,6 +29,46 @@
     // get fiche
     async function updateData() {
         wip = true;
+
+        //init liste des queues
+        queues = [{"id": 0, "lib": ""}];
+        ApiFetch('queues')
+            .then((js) => {
+                queues.push(...js.data);
+                queues = queues; //force maj ui
+            }) 
+            .catch(err => {
+                footMsgClass = 'error';
+                footMsg = err;
+                return;
+            });
+
+        //init liste des scheds
+        scheds = [{"id": 0, "lib": ""}];
+        ApiFetch('scheds')
+            .then((js) => {
+                scheds.push(...js.data);
+                scheds = scheds; //force maj ui
+            }) 
+            .catch(err => {
+                footMsgClass = 'error';
+                footMsg = err;
+                return;
+            });
+
+        // init des taches
+        tasks = [{"id": 0, "lib": ""}];
+        ApiFetch('tasks')
+            .then((js) => {
+                tasks.push(...js.data);
+                tasks = tasks; //force maj ui
+            }) 
+            .catch(err => {
+                footMsgClass = 'error';
+                footMsg = err;
+                return;
+            });
+
         if (id > 0) {
             //recup fiche
             ApiFetch(apiEP+'/'+id)
@@ -76,7 +118,7 @@
                 }
                 wip = false;
                 footMsg = 'ok';
-                footMsgClass = 'info';
+                footMsgClass = 'success';
                 setTimeout(
                     () => {
                         footMsg = '';
@@ -106,7 +148,39 @@
         //retravaille du tableau de tache : pose des index
         data.detail.forEach( (_, i) => {
             data.detail[i].idx = (i+1);
+            //check que les next soit valides
+            let valid_nexts_ids = [];
+            getElmActions(data.detail[i].idx).forEach( (v) => {
+                valid_nexts_ids.push(v.id);
+            });
+            if ( !valid_nexts_ids.includes(data.detail[i].nexttaskid_ok) ) {
+                data.detail[i].nexttaskid_ok = 0;
+            }
+            if ( !valid_nexts_ids.includes(data.detail[i].nexttaskid_fail) ) {
+                data.detail[i].nexttaskid_fail = -1;
+            } 
         });
+    }
+
+    //retourne les actions possible pour de detail
+    function getElmActions(idx) {
+        let actions = [ {
+            "id": 0,
+            "lib": "End OK"
+        }, {
+            "id": -1,
+            "lib": "End Error"
+        }];
+
+        data.detail.forEach( (_, i) => {
+            if ( data.detail[i].idx != idx ) {
+                actions.push({
+                    "id": data.detail[i].idx,
+                    "lib": "Goto " + data.detail[i].idx
+                });
+            }
+        });
+        return actions;
     }
 
     //tags
@@ -180,14 +254,31 @@
                         <label for="errmng">Error Mng</label>
                         <input type="number" id="errmng" readonly={readonly} bind:value="{data.err_management}" placeholder="err management" autocomplete="off" />
                     </div>
+
                     <div class="pure-control-group">
                         <label for="queue">Queue</label>
-                        <input type="number" id="queue" readonly={readonly} bind:value="{data.queueid}" placeholder="queue" autocomplete="off" />
-                    </div>
+
+                        <select id="queue" disabled={readonly} bind:value="{data.queueid}" class="pure-control-group-long">
+                            {#each queues as d}
+                                <option value={d.id}>
+                                    {d.lib}
+                                </option>
+                            {/each}
+                        </select>
+                    </div>                      
+
                     <div class="pure-control-group">
-                        <label for="schedule">Planif</label>
-                        <input type="number" id="schedule" readonly={readonly} bind:value="{data.scheduleid}" placeholder="schedule" autocomplete="off" />
-                    </div>
+                        <label for="sched">scheduling</label>
+
+                        <select id="sched" disabled={readonly} bind:value="{data.scheduleid}" class="pure-control-group-long">
+                            {#each scheds as d}
+                                <option value={d.id}>
+                                    {d.lib}
+                                </option>
+                            {/each}
+                        </select>
+                    </div>                      
+
                     <div class="pure-control-group">
                         <label for="allmanl">Allow manual launch</label>
                         <input type="checkbox" id="allmanl" readonly={readonly} bind:checked="{data.manuallaunch}" />
@@ -214,10 +305,32 @@
                             {#each data.detail as _, d}
                             <tr>
                                 <td>{data.detail[d].idx}</td>
-                                <td><input type="number" readonly={readonly} bind:value="{data.detail[d].taskid}" placeholder="Task" autocomplete="off" /></td>
-                                <td><input type="number" readonly={readonly} bind:value="{data.detail[d].nexttaskid_ok}" placeholder="if ok" autocomplete="off" /></td>
-                                <td><input type="number" readonly={readonly} bind:value="{data.detail[d].nexttaskid_fail}" placeholder="if error" autocomplete="off" /></td>
-                                <td><a href="#+" on:click="{() => removeElm(d)}">remove</a></td>
+                                <!-- tache -->
+                                <td><select disabled={readonly} bind:value="{data.detail[d].taskid}">
+                                    {#each tasks as d}
+                                        <option value={d.id}>
+                                            {d.lib}
+                                        </option>
+                                    {/each}
+                                </select></td>
+                                <!-- suite SI OK -->
+                                <td><select disabled={readonly} bind:value="{data.detail[d].nexttaskid_ok}">
+                                    {#each getElmActions(data.detail[d].idx) as d}
+                                        <option value={d.id}>
+                                            {d.lib}
+                                        </option>
+                                    {/each}
+                                </select></td>
+                                <!-- suite SI KO -->
+                                <td><select disabled={readonly} bind:value="{data.detail[d].nexttaskid_fail}">
+                                    {#each getElmActions(data.detail[d].idx) as d}
+                                        <option value={d.id}>
+                                            {d.lib}
+                                        </option>
+                                    {/each}
+                                </select></td>
+
+                                <td><a href="#+" on:click="{() => removeElm(d)}">-</a></td>
                             </tr>      
                             {/each} 
                             {/if}
@@ -253,9 +366,9 @@
                 </fieldset>
             </form>
 
-            {#if (footMsg!="")}
-            <span class="pure-form-message {footMsgClass}" out:fade|local>{footMsg}</span>    
-            {/if}
+            <div class="pure-message message-{footMsgClass}">
+                <p>{footMsg}</p>
+            </div>
         </div>
     </div>
 </main>

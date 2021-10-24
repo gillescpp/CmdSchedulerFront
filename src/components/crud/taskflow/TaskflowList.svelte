@@ -1,9 +1,9 @@
 <script>
     import { onMount } from "svelte";
-    import { ApiFetch } from './../../../common/global.js'   
+    import { ApiFetch, ApiPost } from './../../../common/global.js'   
     
     export let routeParams = {};
-    const plimit = 10;
+    const plimit = 20;
     const apiEP = 'taskflows';
     let readonly = routeParams.readonly;
     let wip = true;
@@ -41,6 +41,19 @@
         });
     }
     
+    // lancement tache manu
+    async function launchTF(id) {
+		let tf = {"id":id} ;
+
+        ApiPost("taskflows/launch", 0, tf)
+            .then((resp) => {
+                console.log('tache lancé');
+            }) 
+            .catch(err => {
+                console.log(err);
+            });
+	}
+
 </script>
 
 <main>
@@ -72,7 +85,14 @@
                     {#each data.data as item}
                     <tr>
                         <td><a href={routeParams.page.path+'/'+item.id}>{item.id}</a></td>
-                        <td>{item.lib}</td>
+                        <td>
+                            {item.lib}
+                            {#if item.manuallaunch}
+                            <span class="buble-secondary button-small pull-right clickable" on:click="{() => launchTF(item.id)}">
+                                &#x23F5;
+                            </span>                            
+                            {/if}
+                        </td>
                         <td>{@html item.activ ? '&#10004;' : '&#10008;'}</td>
                     </tr>      
                     {/each} 

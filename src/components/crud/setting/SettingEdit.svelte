@@ -58,7 +58,7 @@
                 }
                 wip = false;
                 footMsg = 'ok';
-                footMsgClass = 'info';
+                footMsgClass = 'success';
                 setTimeout(
                     () => {
                         footMsg = '';
@@ -89,13 +89,13 @@
             <form on:submit|preventDefault="{handleSubmit}" class="pure-form pure-form-aligned {wip ? 'disabled' : ''}">
                 <fieldset>
                     <div class="pure-control-group">
-                        <label for="key">Clé</label>
+                        <label for="key">Key</label>
                         <input type="text" id="key" readonly={readonly || (id!='')} bind:value="{data.key}" placeholder="key" autocomplete="off" />
                         <span class="pure-form-message-inline">required & unique.</span>
                     </div>
                     <div class="pure-control-group">
-                        <label for="val">Disabled</label>
-                        <input type="text" id="val" readonly={readonly} bind:value="{data.value}" placeholder="value" autocomplete="off" />
+                        <label for="val">Value</label>
+                        <input type="text" id="val" readonly={readonly} bind:value="{data.value}" placeholder="value" autocomplete="off" class="pure-control-group-long" />
                     </div>
                     <div class="pure-controls">
                         <a href={'/'+routeParams.page.path} class="pure-button">Liste</a>
@@ -106,9 +106,9 @@
                 </fieldset>
             </form>
 
-            {#if (footMsg!="")}
-            <span class="pure-form-message {footMsgClass}" out:fade|local>{footMsg}</span>    
-            {/if}
+            <div class="pure-message message-{footMsgClass}">
+                <p>{footMsg}</p>
+            </div>
         </div>
     </div>
 </main>

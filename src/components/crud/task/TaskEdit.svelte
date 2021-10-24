@@ -3,8 +3,7 @@
     import { NewModel } from './../../../common/model.js'
     import { ApiFetch, ApiPost } from './../../../common/global.js'  
     import page from 'page.js' 
-    import { fade } from 'svelte/transition';
-
+    
 	const apiEP = 'tasks';
     export let routeParams = {};
     let readonly = routeParams.readonly;
@@ -13,6 +12,8 @@
     let footMsgClass = '';
     let id = 0; //0=nouveau
     let data = NewModel(routeParams.page.entity);
+    let agents = [];
+    let selectedAgent = 0; //1 seul agent géré
 
     if ( routeParams.params.id > 0 ) {
         id = routeParams.params.id;
@@ -26,6 +27,18 @@
     // get fiche
     async function updateData() {
         wip = true;
+        selectedAgent = 0;
+        //init liste des agents
+        ApiFetch('agents')
+            .then((js) => {
+                agents = js.data
+            }) 
+            .catch(err => {
+                footMsgClass = 'error';
+                footMsg = err;
+                return;
+            });
+
         if (id > 0) {
             //recup fiche
             ApiFetch(apiEP+'/'+id)
@@ -33,6 +46,9 @@
                 footMsg = '';
                 footMsgClass = '';
                 data = js;
+                if ( data.exec_on.length > 0 ) {
+                    selectedAgent = data.exec_on[0]
+                }
                 wip = false;
             }) 
             .catch(err => {
@@ -48,6 +64,7 @@
     //hanfle submit
     function handleSubmit(event) {
         wip = true;
+        data.exec_on[0] = selectedAgent;
 
         ApiPost(apiEP, data.id, data)
             .then((resp) => {
@@ -58,7 +75,7 @@
                 }
                 wip = false;
                 footMsg = 'ok';
-                footMsgClass = 'info';
+                footMsgClass = 'success';
                 setTimeout(
                     () => {
                         footMsg = '';
@@ -81,17 +98,7 @@
     function removeArg() {
         data.args.pop();
         data.args = data.args; //(pour forcer la reactivité svelte)
-    }
-
-    //helper tableau exec_on
-    function appendExecOn() {
-        data.exec_on.push(1);
-        data.exec_on = data.exec_on; //(pour forcer la reactivité svelte)
-    }
-    function removeExecOn() {
-        data.exec_on.pop();
-        data.exec_on = data.exec_on; //(pour forcer la reactivité svelte)
-    }    
+    } 
 
 </script>
 
@@ -110,7 +117,7 @@
                 <fieldset>
                     <div class="pure-control-group">
                         <label for="lib">Name</label>
-                        <input type="text" id="lib" readonly={readonly} bind:value="{data.lib}" placeholder="name" autocomplete="off" />
+                        <input type="text" id="lib" readonly={readonly} bind:value="{data.lib}" placeholder="name" autocomplete="off" class="pure-control-group-long"/>
                     </div>
 
                     <div class="pure-control-group">
@@ -141,44 +148,50 @@
                     {#if data.type=='CmdTask'}
                     <div class="pure-control-group">
                         <label for="Cmd">Cmd</label>
-                        <input type="text" id="Cmd" readonly={readonly} bind:value="{data.cmd}" placeholder="command path" autocomplete="off" />
+                        <input type="text" id="Cmd" readonly={readonly} bind:value="{data.cmd}" placeholder="command path" autocomplete="off" class="pure-control-group-long"/>
                     </div>                       
+
+                    {#if data.args.length == 0}
                     <div class="pure-control-group">
                         <label for="Args">Arguments</label>
-                        
-                        {#each data.args as arg, idx}
+                        <a href="#+" on:click="{() => appendArg()}">+</a>
+                    </div>  
+                    {/if}
+                    {#each data.args as arg, idx}
+                    <div class="pure-control-group">
+                        <label for="Args{idx}">{#if idx == 0}Arguments{/if} </label>
                         <input type="text" id="Arg{idx}" readonly={readonly} bind:value="{arg}" placeholder="argument" autocomplete="off" />    
-                        {/each}
+                        
+                        {#if idx >= (data.args.length-1) }
                         <a href="#+" on:click="{() => appendArg()}">+</a> /
                         <a href="#-" on:click="{() => removeArg()}">-</a>
-                        
-                        <span class="pure-form-message-inline">(optionnel)</span>
+                        {/if}
                     </div>  
+                    {/each}
+
                     <div class="pure-control-group">
                         <label for="StartIn">StartIn</label>
-                        <input type="text" id="StartIn" readonly={readonly} bind:value="{data.start_in}" placeholder="start in folder" autocomplete="off" />
-                        <span class="pure-form-message-inline">(optionnel)</span>
+                        <input type="text" id="StartIn" readonly={readonly} bind:value="{data.start_in}" placeholder="start in folder" autocomplete="off" class="pure-control-group-long"/>
                     </div>     
                     {/if}
 
                     {#if data.type=='URLCheckTask'}
                     <div class="pure-control-group">
                         <label for="Cmd">Url</label>
-                        <input type="text" id="Cmd" readonly={readonly} bind:value="{data.cmd}" placeholder="httpx://..." autocomplete="off" />
+                        <input type="text" id="Cmd" readonly={readonly} bind:value="{data.cmd}" placeholder="httpx://..." autocomplete="off" class="pure-control-group-long"/>
                     </div>                       
                     {/if}
                     
                     <div class="pure-control-group">
                         <label for="ExecOn">ExecOn</label>
 
-                        {#each data.exec_on as e, idx}
-                        <input type="number" id="ExecOn{idx}" readonly={readonly} bind:value="{e}" placeholder="agent num" autocomplete="off" />    
-                        {/each}
-                        <a href="#+" on:click="{() => appendExecOn()}">+</a> /
-                        <a href="#-" on:click="{() => removeExecOn()}">-</a>
-
-
-                        <span class="pure-form-message-inline"></span>
+                        <select bind:value="{selectedAgent}" class="pure-control-group-long" disabled={readonly}>
+                            {#each agents as a}
+                                <option value={a.id}>
+                                    {a.host}
+                                </option>
+                            {/each}
+                        </select>
                     </div>  
 
                     <div class="pure-control-group">
@@ -194,9 +207,9 @@
                 </fieldset>
             </form>
 
-            {#if (footMsg!="")}
-            <span class="pure-form-message {footMsgClass}" out:fade|local>{footMsg}</span>    
-            {/if}
+            <div class="pure-message message-{footMsgClass}">
+                <p>{footMsg}</p>
+            </div>
         </div>
     </div>
 </main>

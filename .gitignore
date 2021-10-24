@@ -5,3 +5,5 @@
 public/caddy run.bat
 public/caddy_windows_amd64.exe
 public/Caddyfile
+
+*.exe

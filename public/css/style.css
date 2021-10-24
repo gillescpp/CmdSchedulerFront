@@ -5,6 +5,13 @@
     box-sizing: border-box;
 }
 
+
+html, body, #layout, main {
+    height: 100vh;
+    margin: 0px;
+    padding: 0px;
+}
+
 a {
     text-decoration: none;
     color: rgb(61, 146, 201);
@@ -88,6 +95,8 @@ pre {
 .content {
     padding: 2em 1em 0;
     max-width: 800px;
+    overflow: auto;
+    max-height: 100vh;
 }
 .column-block {
     margin: 0 0.5em 2em;
@@ -127,11 +136,21 @@ pre {
 	font-size: 0.8em;
 }
 
+.clickable {
+    cursor: pointer;
+}
+
+.pure-control-group-long {
+    width:60%;
+}
+
 /*Sidebar*/
 .sidebar {
     background: rgb(61, 79, 93);
     color: #fff;
     max-width: 250px;
+    height: 100%;
+    padding: 1em 0;
 }
 
 .full-width-list {

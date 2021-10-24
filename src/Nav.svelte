@@ -42,11 +42,11 @@
 	<div id="menu">
 		<div class="pure-menu">
 			<div class="sidebar-title">
-				<span id="txttitle" class="pure-menu-heading">Cmd Scheduler</span>
+				<span id="txttitle" class="pure-menu-heading">Scheduler</span>
 				<span id="favicon"><img src="favicon24.png" alt="Cmd Scheduler" /></span>
 			</div>
 
-			<a href="/#disconnect" class="pure-button button-xxsmall" on:click="{disconnect}">x</a>
+			<a href="/#disconnect" class="" on:click="{disconnect}">&crarr;</a>
 
 			<ul class="pure-menu-list">
 				{#each mnuView as item}

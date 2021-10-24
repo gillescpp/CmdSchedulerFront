@@ -58,7 +58,7 @@
                 }
                 wip = false;
                 footMsg = 'ok';
-                footMsgClass = 'info';
+                footMsgClass = 'success';
                 setTimeout(
                     () => {
                         footMsg = '';
@@ -148,9 +148,9 @@
                 </fieldset>
             </form>
 
-            {#if (footMsg!="")}
-            <span class="pure-form-message {footMsgClass}" out:fade|local>{footMsg}</span>    
-            {/if}
+            <div class="pure-message message-{footMsgClass}">
+                <p>{footMsg}</p>
+            </div>
         </div>
     </div>
 </main>

@@ -5,7 +5,7 @@ import { len } from "page.js";
     import { ApiFetch } from './../../../common/global.js'   
     
     export let routeParams = {};
-    const plimit = 10;
+    const plimit = 20;
     const apiEP = 'cfgs';
     let readonly = routeParams.readonly;
     let wip = true;

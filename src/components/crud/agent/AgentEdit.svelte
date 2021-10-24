@@ -82,7 +82,7 @@
                 }
                 wip = false;
                 footMsg = 'ok';
-                footMsgClass = 'info';
+                footMsgClass = 'success';
                 setTimeout(
                     () => {
                         footMsg = '';
@@ -135,12 +135,12 @@
                     {/if}
                     <div class="pure-control-group">
                         <label for="apikey">Api key</label>
-                        <input type="text" id="apikey" readonly={readonly} bind:value="{data.apikey}" placeholder="api key" autocomplete="off" />
+                        <input type="text" id="apikey" readonly={readonly} bind:value="{data.apikey}" placeholder="api key" autocomplete="off" class="pure-control-group-long" />
                     </div>
 
                     <div class="pure-control-group">
                         <label for="certsign">Approved certsign</label>
-                        <input type="text" id="certsign" readonly={readonly} bind:value="{data.certsign}" placeholder="approved cert sign" autocomplete="off" />
+                        <input type="text" id="certsign" readonly={readonly} bind:value="{data.certsign}" placeholder="approved cert sign" autocomplete="off" class="pure-control-group-long" />
                     </div>
                     <div class="pure-control-group">
                         <label for="activ">Disabled</label>
@@ -158,9 +158,9 @@
                 </fieldset>
             </form>
 
-            {#if (footMsg!="")}
-            <span class="pure-form-message {footMsgClass}" out:fade|local>{footMsg}</span>    
-            {/if}
+            <div class="pure-message message-{footMsgClass}">
+                <p>{footMsg}</p>
+            </div>
         </div>
     </div>
 </main>

@@ -1,19 +1,17 @@
 <script>
 	import { onMount, onDestroy } from "svelte";
-    import { ApiFetch, ApiPost, IsAuth } from './../common/global.js'  
+    import { ApiFetch, IsAuth } from './../common/global.js'  
 
 	const apiEP = 'queue/state';
     export const routeParams = {};
 	let interval;
 	let next_tasks = [];
+	let inprogress_tasks = [];
 	let queues = [];
-	let tfManu = [];
-	let tfManuRefreshing = false;
 
     //fetch info
     onMount(async function() {
 		updateData()
-		refreshTF()
 
 		interval = setInterval(() => {
 			updateData();
@@ -37,44 +35,32 @@
 			//map id=queuesstate => [] pour l'etat des taches
 			queues = Object.values(js.queues)
 			next_tasks = js.next_task;
+			inprogress_tasks = js.tasks;
 		}) 
 		.catch(err => {
 			console.log(err)
 		});
-    }	
-
-    // lancement tache manu
-    async function launchTF(id) {
-		let tf = {"id":id} ;
-
-        ApiPost("taskflows/launch", 0, tf)
-            .then((resp) => {
-                console.log('tache lancé');
-            }) 
-            .catch(err => {
-                console.log(err);
-            });
-	}
-
-    // maj liste tache manu
-    async function refreshTF() {
-		if ( tfManuRefreshing ) {
-			return;
+    }
+	
+    //util icone état
+    function getStateHtmlIcon(state) {
+		let html = "&#x23F9;";
+		switch(state) {
+			case 1: //StateNew (normalement n'arrive pas)
+				html = "&#x23FA;";
+				break;
+			case 2: //StateQueued
+				html = "&#x23F3;";
+				break;
+			case 3: //StateInProgress
+				html = "&#x23F5;";
+				break;
+			case 4: //StateTerminated (normalement n'arrive pas)
+				html = "&#x23F9;";
+				break;
 		}
-		//todo grisé si pas droits lancement ?
-        let params = new Map()
-        params.set("manuallaunch", "eq:"+true);
-
-        ApiFetch('taskflows', params)
-        .then((json) => {
-            tfManu = json.data;
-			tfManuRefreshing = false;
-        }) 
-        .catch(err => {
-            console.log(err)
-			tfManuRefreshing = false;
-        });
-	}	
+		return html;
+	}
 
 </script>
 
@@ -106,30 +92,24 @@
 			{/each} 
 		</div>
 
-		<!-- lancement manuel  {droits ? 'disabled' : ''} -->
+		<!-- taches en cours -->
 		<div  class="full-width-list">
 			<table class="pure-table pure-table-horizontal">
 				<thead>
 				<tr>
-					<th>Manual Launch
-						<span class="buble-secondary button-small pull-right">
-							<a href="#refreshTF" class="clear-link" on:click="{refreshTF}">
-								{@html tfManuRefreshing ? '&#x22f3;' : '&#x21bb;'}
-							</a>
-						</span>
-					</th>  
+					<th>Tasks in progress</th>  
 				</tr>
 				</thead>
 
 				<tbody>
-				{#each tfManu as tf}
+				{#each inprogress_tasks as t}
 				<tr>
 					<td>
-						{tf.lib}
+						{t.lib}
 						<span class="buble-secondary button-small pull-right">
-							<a href="#launchTF" class="clear-link" on:click="{() => launchTF(tf.id)}">&#x23F5;</a>
+							{@html getStateHtmlIcon(t.state)}
 						</span>
-					</td>  <!-- waiting : 23F3 -->
+					</td>  
 				</tr>
 				{/each} 
 				</tbody>

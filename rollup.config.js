@@ -17,7 +17,9 @@ function serve() {
 	return {
 		writeBundle() {
 			if (server) return;
-			server = require('child_process').spawn('npm', ['run', 'start', '--', '--dev'], {
+			//flag --dev ne marche pas avec caddy
+			//server = require('child_process').spawn('npm', ['run', 'start', '--', '--dev'], { 
+			server = require('child_process').spawn('npm', ['run', 'start', '--'], {
 				stdio: ['ignore', 'inherit', 'inherit'],
 				shell: true
 			});
