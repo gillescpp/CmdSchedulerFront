@@ -115,6 +115,30 @@ export async function ApiFetch (entryPoint, params) {
     });
 }
 
+
+// appel GET api, en batch pour récuperer tous les records
+export async function ApiFetchFull (entryPoint, params) {
+    let allData = [];
+    let morePagesAvailable = true;
+    let currentPage = 0;
+
+    //fore la limite au max
+    if (!params) {
+        params = new Map()
+    }
+    params.set("limit", 100);
+  
+    while(morePagesAvailable) {
+      currentPage++;
+      params.set("page", currentPage);
+      const response = await ApiFetch(entryPoint, params)
+      let jsresp = await response;
+      jsresp.data.forEach(e => allData.push(e));
+      morePagesAvailable = jsresp.page < jsresp.totalPage;
+    }
+    return allData;
+}
+
 // appel POST/PUT api
 export async function ApiPost (url, id, jsPayload) {
     let headers = new Headers();

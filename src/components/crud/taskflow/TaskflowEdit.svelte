@@ -1,7 +1,7 @@
 <script>
     import { onMount } from "svelte";
     import { NewModel } from './../../../common/model.js'
-    import { ApiFetch, ApiPost } from './../../../common/global.js'  
+    import { ApiFetch, ApiPost, ApiFetchFull } from './../../../common/global.js'  
     import page from 'page.js' 
 
 	const apiEP = 'taskflows';
@@ -32,10 +32,10 @@
 
         //init liste des queues
         queues = [{"id": 0, "lib": ""}];
-        ApiFetch('queues')
+        await ApiFetchFull('queues')
             .then((js) => {
-                queues.push(...js.data);
-                queues = queues; //force maj ui
+                queues.push(...js);
+                queues = queues;
             }) 
             .catch(err => {
                 footMsgClass = 'error';
@@ -45,10 +45,10 @@
 
         //init liste des scheds
         scheds = [{"id": 0, "lib": ""}];
-        ApiFetch('scheds')
+        await ApiFetchFull('scheds')
             .then((js) => {
-                scheds.push(...js.data);
-                scheds = scheds; //force maj ui
+                scheds.push(...js);
+                scheds = scheds;
             }) 
             .catch(err => {
                 footMsgClass = 'error';
@@ -58,10 +58,10 @@
 
         // init des taches
         tasks = [{"id": 0, "lib": ""}];
-        ApiFetch('tasks')
+        await ApiFetchFull('tasks')
             .then((js) => {
-                tasks.push(...js.data);
-                tasks = tasks; //force maj ui
+                tasks.push(...js);
+                tasks = tasks;
             }) 
             .catch(err => {
                 footMsgClass = 'error';

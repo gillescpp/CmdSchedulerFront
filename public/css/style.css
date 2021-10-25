@@ -94,7 +94,7 @@ pre {
 /*Content*/
 .content {
     padding: 2em 1em 0;
-    max-width: 800px;
+    /*max-width: 800px;*/
     overflow: auto;
     max-height: 100vh;
 }

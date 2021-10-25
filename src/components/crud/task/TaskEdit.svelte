@@ -1,7 +1,7 @@
 <script>
     import { onMount } from "svelte";
     import { NewModel } from './../../../common/model.js'
-    import { ApiFetch, ApiPost } from './../../../common/global.js'  
+    import { ApiFetch, ApiPost, ApiFetchFull } from './../../../common/global.js'  
     import page from 'page.js' 
     
 	const apiEP = 'tasks';
@@ -29,9 +29,11 @@
         wip = true;
         selectedAgent = 0;
         //init liste des agents
-        ApiFetch('agents')
+        agents = [];
+        await ApiFetchFull('agents')
             .then((js) => {
-                agents = js.data
+                agents.push(...js);
+                agents = agents;
             }) 
             .catch(err => {
                 footMsgClass = 'error';
