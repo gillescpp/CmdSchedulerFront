@@ -5,6 +5,7 @@ export function NewModel(name) {
       "id": 0,
       "lib": "",
       "size": 0,
+      "slot": 1,
       "timeout": 0, //en ms
       "paused": false,
       "paused_from": null, //readonly

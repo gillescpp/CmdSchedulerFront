@@ -94,9 +94,14 @@
                         <span class="pure-form-message-inline">required & unique.</span>
                     </div>
                     <div class="pure-control-group">
+                        <label for="size">Slots</label>
+                        <input type="number" id="slot" readonly={readonly} bind:value="{data.slot}" autocomplete="off" />
+                    </div>
+                    <div class="pure-control-group">
                         <label for="size">Max Size</label>
                         <input type="number" id="size" readonly={readonly} bind:value="{data.size}" autocomplete="off" />
                     </div>
+
                     <div class="pure-control-group">
                         <label for="timeout">Timeout (ms)</label>
                         <input type="number" id="timeout" readonly={readonly} bind:value="{data.timeout}" autocomplete="off" />

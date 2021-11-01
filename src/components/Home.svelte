@@ -55,11 +55,17 @@
 			case 3: //StateInProgress
 				html = "&#x23F5;";
 				break;
-			case 4: //StateTerminated (normalement n'arrive pas)
-				html = "&#x23F9;";
+			case 4: //StateTerminated
+				html = "&#x23CF;";
 				break;
 		}
 		return html;
+	}
+
+    //util icone état
+    function fmtDate(dt) {
+		var d = new Date(dt);	
+		return d.toLocaleString();
 	}
 
 </script>
@@ -77,7 +83,7 @@
 		<div class="column-block-container">
 			{#each queues as q}
 			<div class="column-block">
-				<div class="column-block-header {q.paused ? '' : 'column-success'} "> 
+				<div class="column-block-header {q.paused ? '' : 'column-success'} " title="{q.lib} {q.paused ? ' [PAUSED] ' : ' '}: {q.processing} Processing / {q.size} maxsize"> 
 					<h2>{q.lib} {@html q.paused ? '&#x23F8;' : '&#x23F5;'} </h2>
 					<span class="column-block-info">  
 						<div class="{q.processing > 0 ? 'lds-facebook' : ''}">-<div></div><div></div><div></div></div>  
@@ -85,7 +91,7 @@
 					</span>
 				</div>
 				<ul class="column-block-list">
-					<li>Processing <span class="buble-secondary button-small pull-right">{q.processing}</span></li>
+					<li>Processing <span class="buble-secondary button-small pull-right" title="{q.processing} Processing / {q.slot} slots">{q.processing}</span></li>
 					<li>Waiting <span class="buble-warning button-small pull-right">{q.waiting}</span></li>
 				</ul>
 			</div>			
@@ -103,9 +109,14 @@
 
 				<tbody>
 				{#each inprogress_tasks as t}
-				<tr>
-					<td>
-						{t.lib}
+				<tr class="state_{t.state}">
+					<td title="{t.taskflow_lib}, duration = {t.duration}">
+						{t.taskflow_lib}
+						
+						{#if (t.queue_id > 0) }
+						<span>  ({t.queue_lib})</span>
+						{/if}
+
 						<span class="buble-secondary button-small pull-right">
 							{@html getStateHtmlIcon(t.state)}
 						</span>
@@ -128,7 +139,14 @@
 				<tbody>
 					{#each next_tasks as t}
 					<tr>
-						<td>{t}</td>
+						<td>
+							{fmtDate(t.dt_ref)} : 
+							{t.taskflow_lib}
+
+							{#if (t.queue_id > 0) }
+							<span>  ({t.queue_lib})</span>					
+							{/if}
+						</td>  
 					</tr>
 					{/each} 
 				</tbody>
@@ -152,8 +170,35 @@
   text-decoration: none;
 }
 
+/* task state undefined */
+.state_0 {
+  color: rgb(70, 65, 65);
+  background-color: rgb(241, 241, 241);
+}
+/* task state new */
+.state_1 {
+  color: rgb(70, 65, 65);
+  background-color: rgb(241, 241, 241);
+}
+/* task state queued */
+.state_2 {
+  color: rgb(70, 65, 65);
+  background-color: rgb(241, 241, 241);
+}
+/* task state running */
+.state_3 {
+  color: black;
+  background-color: rgb(142, 255, 168);
+}
+/* task state terminated */
+.state_4 {
+  text-decoration: line-through;
+  color: rgb(70, 65, 65);
+  background-color: rgb(241, 241, 241);
+}
 
 
+/* anime travail en cours */
 .lds-facebook {
   display: inline-block;
   position: relative;
