@@ -87,7 +87,7 @@
 					<h2>{q.lib} {@html q.paused ? '&#x23F8;' : '&#x23F5;'} </h2>
 					<span class="column-block-info">  
 						<div class="{q.processing > 0 ? 'lds-facebook' : ''}">-<div></div><div></div><div></div></div>  
-						<span>{q.processing} / {@html q.size <= 0 ? '&#x221E;' : q.size}</span>
+						<span>{q.processing+q.waiting} / {@html q.size <= 0 ? '&#x221E;' : q.size}</span>
 					</span>
 				</div>
 				<ul class="column-block-list">
@@ -103,7 +103,7 @@
 			<table class="pure-table pure-table-horizontal">
 				<thead>
 				<tr>
-					<th>Tasks in progress</th>  
+					<th>Tasks in progress ({inprogress_tasks.length})</th>  
 				</tr>
 				</thead>
 
